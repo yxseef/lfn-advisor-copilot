@@ -31,6 +31,32 @@ def test_landing_page_renders() -> None:
     assert any("not investment advice" in w.value for w in at.warning)
 
 
+def test_meeting_brief_page_guards_export(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("core.llm.resolve_api_key", lambda: None)
+    at = AppTest.from_file(str(ROOT / "pages" / "2_Meeting_Brief.py"), default_timeout=90).run()
+    assert not at.exception, at.exception
+    assert any("not investment advice" in w.value for w in at.warning)
+    assert any("How this AI works" in s.value for s in at.subheader)
+
+    at.text_area(key="advisor_note").set_value("ping me at ada@example.com").run()
+    at.button(key="generate_brief").click().run()
+    assert not at.exception, at.exception
+    assert any("email" in e.value.lower() for e in at.error)
+    assert not any(w.value.startswith("AI-generated draft") for w in at.warning)
+
+    at.text_area(key="advisor_note").set_value("").run()
+    at.button(key="generate_brief").click().run()
+    assert not at.exception, at.exception
+    assert any(w.value.startswith("AI-generated draft") for w in at.warning)
+    assert len(at.download_button) == 2
+    assert all(button.disabled for button in at.download_button)
+
+    at.button(key="mark_reviewed").click().run()
+    assert not at.exception, at.exception
+    assert len(at.download_button) == 2
+    assert all(not button.disabled for button in at.download_button)
+
+
 def test_risk_monitor_renders_for_every_client() -> None:
     at = AppTest.from_file(str(ROOT / "pages" / "1_Risk_Monitor.py"), default_timeout=60).run()
     assert not at.exception

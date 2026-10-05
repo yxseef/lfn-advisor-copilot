@@ -1,0 +1,228 @@
+{
+  "prompt_version": "1.0",
+  "note": "Qualitative copy only. Figures and alerts are joined from the Risk Monitor when a brief is built.",
+  "clients": {
+    "C01": {
+      "situation": "{name} is a fictional law firm. This {account_type} account is run with a {risk_profile} profile and represents the étude's own treasury, not money held for a client of the firm. The book was built with a large cash reserve, so operating liquidity versus invested assets is the theme to confirm.",
+      "extra_questions": [
+        "Which part of the cash is a working-capital reserve of the étude, and which part could stay invested for longer?"
+      ]
+    },
+    "C02": {
+      "situation": "{name} is a fictional fiduciary. The {account_type} account has a {risk_profile} profile and an existing Lombard drawing. Keep the firm's own balance sheet distinct from any client money the fiduciary administers.",
+      "extra_questions": [
+        "Which balances, if any, are client money that should never sit on this firm account?"
+      ]
+    },
+    "C03": {
+      "situation": "{name} is a fictional notary, with a {account_type} account and a {risk_profile} profile. The portfolio was built around a large inherited single-stock line, so concentration against the profile is the designed theme of this relationship.",
+      "extra_needs": [
+        "Discuss the single-line concentration as a fact of the book, including whether the client already accepts it under the profile."
+      ],
+      "extra_questions": [
+        "Is the concentrated line an inheritance, and is there a family or tax constraint on disposing of it?"
+      ]
+    },
+    "C04": {
+      "situation": "{name} is a fictional lawyer, with a {account_type} account and a {risk_profile} profile. The book was built equity-heavy, with a Lombard drawing that sits close to the lending value, so credit headroom comes before any new request.",
+      "extra_needs": [
+        "Review the existing Lombard drawing before any conversation about further credit."
+      ],
+      "extra_questions": [
+        "What was the original purpose of the loan, and does that purpose still hold?"
+      ]
+    },
+    "C05": {
+      "situation": "{name} is a fictional fiduciary. The {account_type} account is {risk_profile} and was built as a smaller firm treasury with a bond-heavy mix. Confirm that these assets are the firm's own and not client funds waiting to be paid out.",
+      "extra_questions": [
+        "Are any client tax payments or salary payments due from this account over the coming year?"
+      ]
+    },
+    "C06": {
+      "situation": "{name} is a fictional notarial firm. The {account_type} account has a {risk_profile} profile. A notarial firm often needs both working capital and segregated consignment accounts; this meeting is about the firm's own portfolio, and consignment money must not be mixed into it.",
+      "extra_questions": [
+        "Does the étude already run consignment accounts elsewhere, and is the separation from this portfolio documented?"
+      ]
+    },
+    "C07": {
+      "situation": "{name} is a fictional lawyer, with a {account_type} account and a {risk_profile} profile. The book was built with a large single equity line, which is the concentration theme for this client.",
+      "extra_questions": [
+        "Is the large equity line tied to a former employer or to a personal attachment, and does that constrain the profile?"
+      ]
+    },
+    "C08": {
+      "situation": "{name} is a fictional tax fiduciary. The {account_type} account is {risk_profile} and carries a Lombard loan. The practice sees client structures every day; this account is the firm's own, and the brief must stay on this selected client.",
+      "extra_questions": [
+        "Does the fiduciary's own borrowing stay clearly separate from any facility arranged for a client of the firm?"
+      ]
+    },
+    "C09": {
+      "situation": "{name} is a fictional notary, with a {account_type} account and a {risk_profile} profile. The book was built with a high foreign-currency weight, so currency exposure against the profile is the designed theme.",
+      "extra_questions": [
+        "Which of the client's expenses are in Swiss francs, and is the foreign-currency weight deliberate?"
+      ]
+    },
+    "C10": {
+      "situation": "{name} is a fictional law firm. The {account_type} account has a {risk_profile} profile, a Lombard loan, and advance rates on equities that were set tighter than the standard grid because the collateral was treated as concentrated. Credit capacity is the designed theme.",
+      "extra_questions": [
+        "Does the client know that the advance rates on equities are tighter than the standard grid, and what a change in the mix would mean for capacity?"
+      ]
+    }
+  },
+  "meeting_types": {
+    "annual_review": {
+      "probable_needs": [
+        "Confirm that the risk profile still describes the client's situation, horizon and ability to bear a loss.",
+        "Separate cash that the professional activity needs over the coming year from assets that can stay invested.",
+        "Go through each open Risk Monitor alert and record whether the client accepts it or wants it discussed."
+      ],
+      "banking_solutions": [
+        {
+          "category": "Portfolio discussion",
+          "when": "always",
+          "why_discuss": "Compare the current mix with the agreed profile, using the figures computed by the Risk Monitor. Raising a gap is a discussion topic, not an instruction to change a holding."
+        },
+        {
+          "category": "Liquidity management",
+          "when": "always",
+          "why_discuss": "Discuss how much cash the firm or the household needs to keep available, and how the rest is invested. This is a generic cash-management topic only."
+        },
+        {
+          "category": "Wealth planning",
+          "when": "always",
+          "why_discuss": "Ask whether personal estate planning, of the private client or of the firm's partners, belongs on a later agenda. No structure is proposed in this draft."
+        },
+        {
+          "category": "Lombard credit",
+          "when": "has_lombard",
+          "why_discuss": "A loan is already on the file. Discuss whether its purpose and its headroom are still right. This draft does not grant, size or reprice credit."
+        }
+      ],
+      "questions_to_ask": [
+        "Has the professional activity, the family situation or the time horizon changed since the profile was signed?",
+        "Which payments must this account fund over the coming year?",
+        "Are the open alerts accepted, or should they be the centre of the meeting?",
+        "Is any third-party money mixed with this account?"
+      ],
+      "compliance_points": [
+        "Refresh KYC: identity of the contracting party, and of the beneficial owners if the account belongs to a firm.",
+        "Confirm the source of funds and whether it has changed since onboarding.",
+        "Where the client is a lawyer, a fiduciary or a notary, confirm that this account is their own money and not client money held for someone else.",
+        "Record who attended, and that this draft gave no instruction to transact."
+      ]
+    },
+    "credit_request": {
+      "probable_needs": [
+        "Understand the purpose of the credit, the horizon and the source of repayment, in the client's own words.",
+        "Read the borrowing capacity the current collateral already implies from the Risk Monitor, before any amount is written down.",
+        "Keep the credit decision outside this draft: the meeting prepares the conversation, it does not approve the credit."
+      ],
+      "banking_solutions": [
+        {
+          "category": "Lombard credit",
+          "when": "always",
+          "why_discuss": "A Lombard facility is secured by a pledged portfolio, and the amount the bank will lend depends on the asset mix. Discuss that mechanism in generic terms. This draft does not approve, size or price a loan."
+        },
+        {
+          "category": "Portfolio discussion",
+          "when": "always",
+          "why_discuss": "The quality of the collateral is the portfolio itself. Use the concentration, currency and stress figures to prepare questions about how robust a pledge would be."
+        },
+        {
+          "category": "Liquidity management",
+          "when": "always",
+          "why_discuss": "Ask how interest and repayment would be funded if markets fall, and whether cash needed for the professional activity has to stay untouched."
+        }
+      ],
+      "questions_to_ask": [
+        "What would the credit fund, and why is borrowing the route the client wants to discuss?",
+        "What horizon and what source of repayment does the client have in mind?",
+        "Is the whole portfolio free to be pledged, or is part of it already committed?",
+        "What happens to the professional activity if collateral has to be discussed again after a market fall?"
+      ],
+      "compliance_points": [
+        "The purpose of the loan and the source of repayment belong in the credit file. Collect them in the official process, not in this note.",
+        "Confirm the beneficial owner of the assets that would be pledged.",
+        "Confirm the source of funds of the portfolio that would serve as collateral.",
+        "KYC has to be current before a credit conversation goes any further. This draft is not an approval and not a term sheet."
+      ]
+    },
+    "succession": {
+      "probable_needs": [
+        "Clarify the role of the étude in this succession, and keep that role distinct from the étude's own account shown in the figures.",
+        "Prepare the questions on the estate, the heirs and the timing, without writing any heir's name into this tool.",
+        "Treat liquidity for taxes and legacies as a point to confirm in the meeting, not as a fact this draft already knows."
+      ],
+      "banking_solutions": [
+        {
+          "category": "Estate account",
+          "when": "always",
+          "why_discuss": "An estate can be given its own account, distinct from the notary's or the lawyer's firm account. Discuss that separation. This draft does not open an account."
+        },
+        {
+          "category": "Wealth planning",
+          "when": "always",
+          "why_discuss": "The transmission of the deceased's assets is a wealth-planning conversation with the heirs, once they have been identified through the normal KYC process."
+        },
+        {
+          "category": "Consignment account",
+          "when": "always",
+          "why_discuss": "If the estate includes a property sale, a consignment account may be the right vessel for the proceeds. Confirm whether that is so; do not assume it."
+        },
+        {
+          "category": "Liquidity management",
+          "when": "always",
+          "why_discuss": "Estates often need cash for tax and for legacies. Raise liquidity as a question. The figures in this brief belong to the selected professional, who may not be the estate."
+        }
+      ],
+      "questions_to_ask": [
+        "Who is the client of the étude in this succession, and at what stage is the file? Answer in the meeting, not in the free-text note.",
+        "Is the selected account the professional's own money, which must not be mixed with the estate?",
+        "Have the heirs been identified through KYC outside this tool?",
+        "Does the estate include a property transaction that would call for a consignment account?"
+      ],
+      "compliance_points": [
+        "KYC of the estate and of each heir is done outside this tool. Do not type their names or identifiers here.",
+        "The source of funds of the estate has to be documented, including the notarial deed.",
+        "Beneficial ownership must be established before any estate money is booked.",
+        "The professional's own account and the estate's money stay segregated."
+      ]
+    },
+    "consignment_account": {
+      "probable_needs": [
+        "Understand the underlying transaction and how long the funds are expected to remain, without recording the parties' names in this tool.",
+        "Make the difference explicit between a consignment account and the firm's own account shown in the figures.",
+        "Confirm who may give payment instructions and how a release is approved."
+      ],
+      "banking_solutions": [
+        {
+          "category": "Consignment account",
+          "when": "always",
+          "why_discuss": "A consignment account holds third-party money for a defined transaction, segregated from the firm's own assets. Describe it only in that generic way. This draft does not open an account."
+        },
+        {
+          "category": "Firm account",
+          "when": "always",
+          "why_discuss": "The firm's own portfolio, shown in the figures, is a different relationship. The meeting should make that separation explicit so client money is never booked in the firm portfolio."
+        },
+        {
+          "category": "Liquidity management",
+          "when": "always",
+          "why_discuss": "Money on a consignment account is there for a transaction and should not be treated as investable wealth. Discuss that principle; do not propose a placement."
+        }
+      ],
+      "questions_to_ask": [
+        "What is the transaction, and how long are the funds expected to remain?",
+        "Who may give payment instructions, and who must approve a release?",
+        "Are the parties already identified in the étude's KYC file, kept outside this tool?",
+        "Could any of these funds be mistaken for the firm's own assets shown above?"
+      ],
+      "compliance_points": [
+        "KYC of every party to the transaction, including the beneficial owner, is required before the account is used.",
+        "The source of funds of the money entering the consignment account must be documented.",
+        "The balance is third-party money. It is not part of the firm's own portfolio and must stay segregated.",
+        "This draft does not open the account and does not authorise a payment."
+      ]
+    }
+  }
+}

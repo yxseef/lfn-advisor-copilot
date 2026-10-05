@@ -9,7 +9,7 @@ can use data and AI responsibly. No affiliation with any bank.
 - **Risk Monitor** (available): fictional portfolios valued with real market data — volatility, historical VaR and
   Expected Shortfall, concentration, currency exposure, Lombard loan-to-value, risk-profile compliance, stress tests
   and automatic alerts.
-- **Meeting Brief (AI)** (planned)
+- **Meeting Brief (AI)** (available): a pre-meeting briefing for one fictional LFN client. Without an API key it uses pre-generated text plus live Risk Monitor figures. With a key, calls are capped at five per session. Guardrails: personal-data filter on the free-text note, schema-validated JSON, figures checked against the client data, no investment orders, advisor review before export, and a session journal.
 - **LFN Market Map** (planned)
 
 ## Run locally
@@ -22,3 +22,6 @@ pytest
 
 Market data comes from Yahoo Finance and is cached locally. If the download fails, the app falls back to
 `data/prices_fallback.csv` (refresh it with `python -m scripts.update_price_fallback`).
+
+The Meeting Brief runs with no key. For a live model, set `ANTHROPIC_API_KEY` in a gitignored `.env`
+file or in Streamlit secrets (`ANTHROPIC_MODEL` is optional). See `.env.example`.
