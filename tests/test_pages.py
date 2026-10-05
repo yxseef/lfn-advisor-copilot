@@ -29,6 +29,8 @@ def test_landing_page_renders() -> None:
     at = AppTest.from_file(str(ROOT / "app.py")).run()
     assert not at.exception
     assert any("not investment advice" in w.value for w in at.warning)
+    assert any("Available" in m.value and "Meeting Brief" in m.value for m in at.markdown)
+    assert any("Yousif Bag" in m.value for m in at.markdown)
 
 
 def test_meeting_brief_page_guards_export(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -61,6 +63,8 @@ def test_risk_monitor_renders_for_every_client() -> None:
     at = AppTest.from_file(str(ROOT / "pages" / "1_Risk_Monitor.py"), default_timeout=60).run()
     assert not at.exception
     assert any("not investment advice" in w.value for w in at.warning)
+    assert any("Yousif Bag" in m.value for m in at.markdown)
+    assert any("Contribution to risk" in c.value for c in at.caption)
     select = at.selectbox[0]
     for name in select.options:
         select.set_value(name.split("  ·  ")[0]).run()

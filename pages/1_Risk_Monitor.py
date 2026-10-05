@@ -7,7 +7,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from core import APP_NAME, DISCLAIMER
+from core import APP_NAME, AUTHOR_CREDIT, DISCLAIMER
 from core.portfolios import ASSET_CLASS_LABELS, all_tickers, build_clients
 from core.risk import (
     LOMBARD_WARNING_USAGE,
@@ -23,6 +23,17 @@ from core.risk import (
 st.set_page_config(page_title=f"Risk Monitor · {APP_NAME}", layout="wide")
 
 STATUS_COLORS = {"breach": "#f8d7da", "warning": "#fff3cd", "ok": "#d1e7dd"}
+# Blues and greys only. Red stays on alerts, the margin-call line, and stress losses.
+DONUT_COLORS = (
+    "#1e3a5f",
+    "#3b6ea5",
+    "#5b7c99",
+    "#7d93a8",
+    "#94a3b8",
+    "#64748b",
+    "#cbd5e1",
+    "#334155",
+)
 SEVERITY_BOX = {"breach": st.error, "warning": st.warning, "info": st.info}
 
 
@@ -138,8 +149,15 @@ with tab_client:
             alloc = r.concentration.by_asset_class.rename(index=ASSET_CLASS_LABELS)
         else:
             alloc = r.concentration.by_currency
-        fig = go.Figure(go.Pie(labels=alloc.index, values=alloc.values, hole=0.55, sort=False,
-                               textinfo="label+percent"))
+        colors = [DONUT_COLORS[i % len(DONUT_COLORS)] for i in range(len(alloc))]
+        fig = go.Figure(go.Pie(
+            labels=alloc.index,
+            values=alloc.values,
+            hole=0.55,
+            sort=False,
+            textinfo="label+percent",
+            marker=dict(colors=colors, line=dict(color="#ffffff", width=1)),
+        ))
         fig.update_layout(showlegend=False, margin=dict(t=10, b=10, l=10, r=10), height=340)
         st.plotly_chart(fig, width="stretch")
 
@@ -149,15 +167,37 @@ with tab_client:
         rc_long = pd.DataFrame({
             "position": list(rc["name"]) * 2,
             "share": list(rc["weight"]) + list(rc["pct_of_risk"]),
-            "measure": ["Weight"] * len(rc) + ["Share of risk"] * len(rc),
+            "measure": ["Weight"] * len(rc) + ["Contribution to risk"] * len(rc),
         })
-        fig = px.bar(rc_long, x="share", y="position", color="measure", barmode="group", orientation="h",
-                     color_discrete_map={"Weight": "#94a3b8", "Share of risk": "#0f766e"})
-        fig.update_layout(height=380, margin=dict(t=10, b=10, l=10, r=10), xaxis_tickformat=".0%",
-                          yaxis={"categoryorder": "total ascending", "title": None}, xaxis_title=None,
-                          legend=dict(orientation="h", y=-0.15, title=None))
+        fig = px.bar(
+            rc_long,
+            x="share",
+            y="position",
+            color="measure",
+            barmode="group",
+            orientation="h",
+            color_discrete_map={"Weight": "#94a3b8", "Contribution to risk": "#1e3a5f"},
+        )
+        fig.update_layout(
+            height=420,
+            margin=dict(t=10, b=90, l=10, r=10),
+            xaxis_tickformat=".0%",
+            yaxis={"categoryorder": "total ascending", "title": None},
+            xaxis_title=None,
+            legend=dict(
+                orientation="h",
+                yanchor="top",
+                y=-0.18,
+                x=0,
+                title="Weight vs. Contribution to risk",
+            ),
+        )
         st.plotly_chart(fig, width="stretch")
-        st.caption("A position whose share of risk exceeds its weight adds more volatility than its size suggests.")
+        st.caption(
+            "Weight is the position's share of portfolio value; Contribution to risk is its share of "
+            "portfolio volatility, so a contribution above the weight means the position adds more "
+            "volatility than its size suggests."
+        )
 
     st.subheader("Value history (current holdings)")
     fig = go.Figure(go.Scatter(x=r.history.index, y=r.history.values, name="Portfolio value",
@@ -255,3 +295,4 @@ Warning from {LOMBARD_WARNING_USAGE:.0%} usage, margin call above 100 %.
 
 st.divider()
 st.caption(DISCLAIMER)
+st.markdown(AUTHOR_CREDIT)

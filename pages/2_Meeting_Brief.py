@@ -5,7 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from core import APP_NAME, DISCLAIMER
+from core import APP_NAME, AUTHOR_CREDIT, DISCLAIMER
 from core.llm import (
     BANNER,
     DRAFT_NOTICE,
@@ -423,3 +423,4 @@ _how_it_works()
 
 st.divider()
 st.caption(f"{DISCLAIMER} The same alerts are on the Risk Monitor page.")
+st.markdown(AUTHOR_CREDIT)
