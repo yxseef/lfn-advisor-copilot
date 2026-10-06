@@ -6,6 +6,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+from app_pages.guide import page_intro
 from core import APP_NAME, AUTHOR_CREDIT, DISCLAIMER
 from core.market_map import (
     DEFAULT_WEIGHTS,
@@ -27,7 +28,14 @@ TYPE_LABELS = {"lawyer": "Lawyer", "fiduciary": "Fiduciary", "notary": "Notary"}
 st.set_page_config(page_title=f"Market Map · {APP_NAME}", layout="wide")
 st.warning(DISCLAIMER)
 st.title("LFN Market Map")
-st.caption("Law, fiduciary and notary firms in Geneva and Vaud. A prospecting map, not a client list.")
+page_intro(
+    "Rank law, fiduciary and notary firms in Geneva and Vaud to decide whom to contact first.",
+    [
+        "Narrow the firms with the **Canton**, **Type** and **Commune** filters.",
+        "Move the **Prospect score** sliders to weigh what matters to you; the ranking updates at once.",
+        "Read the **Map** and the charts, then download the **Top 20 prospects** as a CSV.",
+    ],
+)
 
 try:
     book = load_firm_book()

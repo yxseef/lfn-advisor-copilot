@@ -7,6 +7,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+from app_pages.guide import page_intro, tour_page
 from core import APP_NAME, AUTHOR_CREDIT, DISCLAIMER
 from core.portfolios import ASSET_CLASS_LABELS, all_tickers, build_clients
 from core.risk import (
@@ -64,17 +65,28 @@ def style_overview(df: pd.DataFrame) -> pd.io.formats.style.Styler:
 
 st.warning(DISCLAIMER)
 st.title("Risk Monitor")
-st.caption(
-    "Fictional LFN client portfolios valued with real market data, in CHF. "
-    "Risk figures use 3 years of daily history applied to today's holdings."
+page_intro(
+    "Spot which client portfolios breach a limit or are close to a margin call, at today's prices.",
+    [
+        "**Book overview** lists every client, coloured by its most severe alert: red for a breach, amber for a warning.",
+        "Open **Client view** and pick a client to see the figures behind the alert: VaR, Lombard usage, stress tests.",
+        "**Methodology & limits** explains each figure and the profile limits.",
+        "The **Ask** button at the bottom right answers questions about the selected client.",
+    ],
 )
 
 results, source, missing, as_of = load_book()
-st.caption(f"Prices: **{source}** · last close **{as_of:%d %b %Y}**")
+st.caption(
+    f"Fictional portfolios, real prices in CHF: **{source}** · last close **{as_of:%d %b %Y}** · "
+    "risk from 3 years of daily history applied to today's holdings."
+)
 if missing:
     st.warning(f"No price data for: {', '.join(missing)}. Affected positions are excluded.")
 
-tab_book, tab_client, tab_method = st.tabs(["Book overview", "Client view", "Methodology & limits"])
+tab_book, tab_client, tab_method = st.tabs(
+    ["Book overview", "Client view", "Methodology & limits"],
+    default="Client view" if tour_page() == "Risk Monitor" else None,
+)
 
 # ---------------------------------------------------------------------------
 # Book overview

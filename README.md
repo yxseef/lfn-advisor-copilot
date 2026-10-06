@@ -28,7 +28,11 @@ has no link to any bank.
 
 ### Home
 
-![Home: top navigation bar, project summary and the four modules](docs/screenshots/home.png)
+On a first visit, Home offers a two-minute tour that follows one fictional client, Me Claire Fontaine, from her
+Lombard warning in the Risk Monitor to her meeting brief and a margin-call question in Ask the Book. Every page also
+opens with one line on what it is for and a collapsed "How to use this page".
+
+![Home: top navigation bar, project summary, the tour link and the four modules](docs/screenshots/home.png)
 
 ### Risk Monitor
 
@@ -89,6 +93,7 @@ app_pages/           Streamlit pages (UI only)
   3_Market_Map.py
   4_Ask_the_Book.py
   ask_ui.py          Ask button and chat window shared by every page (not a page)
+  guide.py           welcome window, guided tour and page help (not a page)
 core/                pure, typed functions, no UI
   portfolios.py      fictional clients and portfolios (fixed seed)
   risk.py            prices, risk metrics, limits, stress tests, alerts

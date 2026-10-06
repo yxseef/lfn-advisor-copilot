@@ -9,6 +9,7 @@ import pandas as pd
 import pytest
 from streamlit.testing.v1 import AppTest
 
+from app_pages.guide import TOUR_CLIENT
 from core import risk
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -38,6 +39,76 @@ def test_landing_page_renders() -> None:
     assert any("Yousif Bag" in m.value for m in at.markdown)
     assert any(s.value == "Why I built this" for s in at.subheader)
     assert not any(s.value in {"The problem", "The solution"} for s in at.subheader)
+
+
+def test_welcome_window_opens_once_and_from_the_link() -> None:
+    at = AppTest.from_file(str(ROOT / "app.py")).run()
+    assert not at.exception, at.exception
+    assert at.button(key="tour_start").label == "Start the tour"
+    assert at.button(key="tour_skip").label == "Explore freely"
+    at.button(key="tour_skip").click().run()
+    assert not any(b.key == "tour_start" for b in at.button)
+    at.run()
+    assert not any(b.key == "tour_start" for b in at.button)
+    at.button(key="tour_link").click().run()
+    assert any(b.key == "tour_start" for b in at.button)
+
+
+def test_tour_keeps_me_fontaine_across_three_pages(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("core.llm.resolve_api_key", lambda: None)
+    at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=90).run()
+
+    def banner() -> str:
+        return " ".join(m.value for m in at.markdown if "tour-label" in m.value)
+
+    def next_from(path: str) -> None:
+        # AppTest forgets the page after a switch_page; a browser keeps it in the URL.
+        at.switch_page(path)
+        at.button(key="tour_next").click().run()
+        assert not at.exception, at.exception
+
+    at.button(key="tour_start").click().run()
+    assert not at.exception, at.exception
+    assert "Step 1 of 3" in banner()
+    assert at.selectbox(key="rm_client").value == TOUR_CLIENT
+
+    next_from("app_pages/1_Risk_Monitor.py")
+    assert "Step 2 of 3" in banner()
+    assert at.selectbox(key="client").value == TOUR_CLIENT
+
+    next_from("app_pages/2_Meeting_Brief.py")
+    assert "Step 3 of 3" in banner()
+    assert at.selectbox(key="ask_focus_client").value == TOUR_CLIENT
+    assert at.button(key="tour_next").label == "Finish the tour"
+
+    next_from("app_pages/4_Ask_the_Book.py")
+    assert banner() == ""
+    assert "tour_step" not in at.session_state
+
+
+def test_leaving_the_tour_page_ends_the_tour() -> None:
+    at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=90).run()
+    at.button(key="tour_start").click().run()
+    assert any("Step 1 of 3" in m.value for m in at.markdown)
+    at.switch_page("app_pages/3_Market_Map.py").run()
+    assert not at.exception, at.exception
+    assert "tour_step" not in at.session_state
+    assert not any("tour-label" in m.value for m in at.markdown)
+
+
+@pytest.mark.parametrize(
+    "page", ["1_Risk_Monitor.py", "2_Meeting_Brief.py", "3_Market_Map.py", "4_Ask_the_Book.py"]
+)
+def test_every_page_explains_itself(page: str, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("core.llm.resolve_api_key", lambda: None)
+    monkeypatch.setattr("core.market_map.fetch_commune", lambda *_a, **_k: None)
+    at = AppTest.from_file(str(ROOT / "app_pages" / page), default_timeout=90).run()
+    assert not at.exception, at.exception
+    assert any("page-purpose" in m.value for m in at.markdown)
+    help_panel = [e for e in at.expander if e.label == "How to use this page"]
+    assert len(help_panel) == 1
+    steps = [line for line in help_panel[0].markdown[0].value.splitlines() if line[:1].isdigit()]
+    assert 3 <= len(steps) <= 4
 
 
 def test_floating_ask_window_answers_on_home(monkeypatch: pytest.MonkeyPatch) -> None:

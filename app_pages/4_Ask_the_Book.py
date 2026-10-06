@@ -18,6 +18,7 @@ from app_pages.ask_ui import (
     render_turn,
     submit_from_key,
 )
+from app_pages.guide import page_intro
 from core import APP_NAME, AUTHOR_CREDIT, DISCLAIMER, llm
 from core.agent import (
     AGENT_PROMPT_VERSION,
@@ -34,9 +35,13 @@ init_state()
 
 st.warning(DISCLAIMER)
 st.title(ASK_TITLE)
-st.caption(
-    "A read-only assistant for the advisor. It answers questions about the fictional book by calling the "
-    "Risk Monitor's own functions, and it cites the figures they return."
+page_intro(
+    "Ask about the whole book in plain English; answers cite figures from the Risk Monitor's own functions.",
+    [
+        "Optionally put a **client in focus**, so that “this client” in a question means that client.",
+        "Click an **example question**, or type your own in the box at the bottom of the page.",
+        "Open **Tools used** under an answer to see which functions ran and the figures they returned.",
+    ],
 )
 
 if llm.resolve_api_key():

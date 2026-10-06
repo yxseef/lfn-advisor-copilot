@@ -8,6 +8,8 @@ import streamlit as st
 
 from app_pages.ask_ui import ASK_TITLE, render_fab
 from app_pages.ask_ui import STYLE as ASK_STYLE
+from app_pages.guide import STYLE as GUIDE_STYLE
+from app_pages.guide import render_tour_banner, render_welcome
 from core import APP_NAME, AUTHOR_CREDIT, DISCLAIMER
 
 ROOT = Path(__file__).resolve().parent
@@ -59,6 +61,7 @@ def home() -> None:
     st.title(APP_NAME)
     st.markdown(f"**{TAGLINE}**")
     st.markdown(AUTHOR_CREDIT)
+    render_welcome()
 
     st.subheader("What it does")
     st.markdown(
@@ -129,6 +132,7 @@ st.set_page_config(page_title=APP_NAME, layout="wide", initial_sidebar_state="co
 st.logo(str(WORDMARK), size="large")
 st.html(STYLE)
 st.html(ASK_STYLE)
+st.html(GUIDE_STYLE)
 navigation = st.navigation(
     [
         st.Page(home, title="Home", default=True),
@@ -139,6 +143,7 @@ navigation = st.navigation(
     ],
     position="top",
 )
+render_tour_banner(navigation.title)
 navigation.run()
 # After the page, so the selected client is known. The full view has its own input.
 if navigation.title != ASK_TITLE:

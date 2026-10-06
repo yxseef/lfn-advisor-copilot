@@ -5,6 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
+from app_pages.guide import page_intro
 from core import APP_NAME, AUTHOR_CREDIT, DISCLAIMER
 from core.llm import (
     BANNER,
@@ -291,9 +292,14 @@ _init_state()
 
 st.warning(DISCLAIMER)
 st.title("Meeting Brief")
-st.caption(
-    "A pre-meeting draft for one fictional LFN client. "
-    "Discussion topics for the advisor, not an order and not a recommendation."
+page_intro(
+    "Prepare a pre-meeting draft for one client: discussion topics for the advisor, never an order.",
+    [
+        "Choose a **client** and a **meeting** type. A short context note is optional.",
+        "Press **Generate brief**. Figures and alerts come from the Risk Monitor, the text from the AI.",
+        "Read the draft, then press **Reviewed by advisor** to unlock the Markdown and PDF export.",
+        "The **Generation journal** below records every draft produced in this session.",
+    ],
 )
 
 results, source, missing, as_of = load_book()
