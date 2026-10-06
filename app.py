@@ -1,4 +1,4 @@
-"""LFN Advisor Copilot: entrypoint. The sidebar label comes from st.Page, not the filename."""
+"""LFN Advisor Copilot: entrypoint. Top navigation, shared style, and the Home page."""
 
 from __future__ import annotations
 
@@ -8,102 +8,120 @@ import streamlit as st
 
 from core import APP_NAME, AUTHOR_CREDIT, DISCLAIMER
 
-SCREENSHOTS = Path(__file__).resolve().parent / "docs" / "screenshots"
+ROOT = Path(__file__).resolve().parent
+SCREENSHOTS = ROOT / "docs" / "screenshots"
+WORDMARK = ROOT / "assets" / "wordmark.svg"
 TAGLINE = (
     "A prototype assistant for LFN client advisors: it monitors portfolio risk, "
     "prepares meetings with guardrailed AI, and helps prioritise prospects."
 )
+# Placeholder until the author supplies the text. Leave as None to show the marked placeholder.
+WHY_I_BUILT_THIS: str | None = None
+
+# Applied to every page because the entrypoint runs before each page.
+STYLE = """
+<style>
+[data-testid="stMainBlockContainer"] { max-width: 1180px; padding-top: 4.5rem; padding-bottom: 4rem; }
+[data-testid="stMain"] [data-testid="stVerticalBlock"] { gap: 1.1rem; }
+h1 { letter-spacing: -0.01em; margin-bottom: 0.25rem; }
+h2, h3 { margin-top: 0.75rem; }
+[data-testid="stMetric"] {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+}
+[data-testid="stMetricLabel"] p { color: #64748b; font-size: 0.8rem; font-weight: 500; }
+[data-testid="stMetricValue"] { font-size: 1.45rem; font-weight: 600; color: #1f2937; }
+[data-testid="stHeader"] { border-bottom: 1px solid #e2e8f0; }
+[data-testid="stHeader"] .rc-overflow { justify-content: flex-end; }
+[data-testid="stTopNavLink"] { background: transparent !important; border-radius: 0; padding-left: 0.85rem; padding-right: 0.85rem; }
+[data-testid="stTopNavLink"]:hover { color: #1e3a5f; }
+[data-testid="stTopNavLink"][aria-current="page"] {
+  color: #1e3a5f;
+  box-shadow: inset 0 -2px 0 #1e3a5f;
+}
+[data-testid="stTopNavLink"][aria-current="page"] p { font-weight: 600; }
+[data-testid="stImage"] img { border: 1px solid #e2e8f0; border-radius: 6px; }
+</style>
+"""
 
 
 def home() -> None:
-    st.warning(DISCLAIMER, icon="⚠️")
+    st.warning(DISCLAIMER)
     st.title(APP_NAME)
-    st.markdown(f"#### {TAGLINE}")
-    st.markdown(
-        "*An independent student prototype for client advisors serving lawyers, fiduciaries and notaries (LFN).*"
-    )
+    st.markdown(f"**{TAGLINE}**")
     st.markdown(AUTHOR_CREDIT)
 
-    st.subheader("The problem")
+    st.subheader("What it does")
     st.markdown(
         """
-LFN clients are professionals with two sets of needs: their own (private wealth, firm treasury,
-Lombard credit) and those of the clients they represent (estates, asset structures, property deals).
-An advisor covering dozens of such relationships must spot risk issues early and prepare every
-meeting thoroughly, with limited time.
-"""
-    )
+LFN advisors cover dozens of lawyers, fiduciaries and notaries, each with private wealth, a firm account and
+client mandates. The copilot does the monitoring and the preparation; the advisor keeps the judgement.
 
-    st.subheader("The solution")
-    st.markdown(
-        """
-A small toolkit that automates the monitoring work and leaves judgement to the advisor:
-
-| Module | What it does | Status |
+| Module | For the advisor | Status |
 |---|---|---|
-| **Risk Monitor** | Values fictional portfolios with real market data; volatility, VaR, concentration, Lombard LTV, profile compliance, stress tests and automatic alerts. | Available |
-| **Meeting Brief (AI)** | Structured pre-meeting briefing for one fictional client, with guardrails and human review. | Available |
-| **LFN Market Map** | Maps law, fiduciary and notary firms in Geneva and Vaud and ranks prospects with a transparent score. | Available (fictional example data) |
+| **Risk Monitor** | Fictional portfolios at today's prices: VaR, Lombard LTV, profile limits, stress tests, alerts. | Available |
+| **Meeting Brief** | A pre-meeting draft for one client. AI writes the text, the risk engine the figures, the advisor approves. | Available |
+| **Market Map** | Law, fiduciary and notary firms in Geneva and Vaud, ranked by a transparent prospect score. | Available |
 """
     )
     st.info(
-        "**Market Map data are a fictional example.** Access to the federal commercial register API (Zefix) "
-        "is restricted: it requires credentials issued by the Federal Registry of Commerce and has no "
-        "industry (NOGA) code. So the public demo ranks invented firms, all named “Exemple…”, placed on "
-        "real Geneva and Vaud communes. The scoring and the map work the same on a real register extract.",
-        icon="ℹ️",
+        "The Market Map uses fictional firms. The federal commercial register API (Zefix) requires credentials "
+        "and has no industry code, so the public demo ranks invented firms placed on real communes."
     )
 
     st.subheader("The modules")
     modules = [
-        ("risk_monitor.png", "Risk Monitor — book overview with alerts by severity.", "app_pages/1_Risk_Monitor.py", "Open the Risk Monitor", "📊"),
-        ("meeting_brief.png", "Meeting Brief — demo draft, risk-engine figures.", "app_pages/2_Meeting_Brief.py", "Open the Meeting Brief", "📝"),
-        ("market_map.png", "Market Map — fictional firms on commune centres.", "app_pages/3_Market_Map.py", "Open the Market Map", "🗺️"),
+        ("risk_monitor.png", "Risk Monitor", "app_pages/1_Risk_Monitor.py"),
+        ("meeting_brief.png", "Meeting Brief", "app_pages/2_Meeting_Brief.py"),
+        ("market_map.png", "Market Map", "app_pages/3_Market_Map.py"),
     ]
-    for column, (image, caption, page, label, icon) in zip(st.columns(3), modules):
+    for column, (image, label, page) in zip(st.columns(3, gap="medium"), modules):
         with column:
             path = SCREENSHOTS / image
             if path.exists():
-                st.image(str(path), caption=caption, width="stretch")
-            st.page_link(page, label=label, icon=icon)
+                st.image(str(path), width="stretch")
+            st.page_link(page, label=f"Open the {label}")
+
+    st.subheader("Why I built this")
+    if WHY_I_BUILT_THIS:
+        st.markdown(WHY_I_BUILT_THIS)
+    else:
+        st.caption("[Placeholder — text to be provided by Yousif Bag.]")
 
     st.subheader("Responsible AI")
     st.markdown(
         """
-The Meeting Brief is the only module that uses a language model. Its guardrails are on by default:
-
-- **Only fictional data goes in.** The prompt holds one fictional client from the Risk Monitor. The advisor's free-text note is blocked if it contains a name, an email, an IBAN or a Swiss AVS number.
-- **Figures come from the risk engine.** AUM, volatility, VaR and alerts are written by the application. Any other number the model writes is marked “(to verify)”.
-- **Discussion topics, not orders.** Banking solutions come from a closed list of generic product families, and sentences that read like a trading instruction are rewritten.
-- **A human signs off.** The draft is labelled “AI-generated draft”, and export to PDF or Markdown stays locked until the advisor marks it as reviewed.
-- **No key, no cost.** Without an API key the page uses pre-written text and makes no model call. With a key, live calls are capped at five per session and each one is logged without the brief or the note.
+- Only the selected fictional client goes into the prompt; notes with names, emails, IBAN or AVS numbers are blocked.
+- Figures come from the risk engine. Any other number the model writes is marked "(to verify)".
+- Discussion topics, not orders: a closed list of product families, and trading-style sentences are rewritten.
+- Export stays locked until the advisor marks the draft as reviewed.
+- Without an API key the page runs on pre-written text; with a key, five calls per session at most.
 """
     )
 
     st.subheader("Tech stack")
     st.markdown(
-        """
-Python · Streamlit (multipage) · pandas · NumPy · Plotly · yfinance (Yahoo Finance prices, CSV fallback) ·
-Anthropic Claude API through one wrapper (optional) · pydantic (output schema) · fpdf2 (PDF export) ·
-swisstopo geo.admin.ch (commune geocoding) · pytest · Streamlit Community Cloud.
-"""
+        "Python · Streamlit · pandas · NumPy · Plotly · yfinance · Anthropic API (optional) · pydantic · fpdf2 · "
+        "swisstopo geo.admin.ch · pytest"
     )
 
     st.divider()
-    st.caption(
-        f"{DISCLAIMER} All clients, portfolios and Market Map firms are invented. No affiliation with any bank. "
-        "Market data from Yahoo Finance, for illustration only."
-    )
+    st.caption(f"{DISCLAIMER} All clients and firms are invented. No affiliation with any bank.")
     st.markdown(AUTHOR_CREDIT)
 
 
-st.set_page_config(page_title=APP_NAME, layout="wide")
+st.set_page_config(page_title=APP_NAME, layout="wide", initial_sidebar_state="collapsed")
+st.logo(str(WORDMARK), size="large")
+st.html(STYLE)
 navigation = st.navigation(
     [
-        st.Page(home, title="Home", default=True, icon="🏠"),
-        st.Page("app_pages/1_Risk_Monitor.py", title="Risk Monitor", icon="📊", url_path="Risk_Monitor"),
-        st.Page("app_pages/2_Meeting_Brief.py", title="Meeting Brief", icon="📝", url_path="Meeting_Brief"),
-        st.Page("app_pages/3_Market_Map.py", title="Market Map", icon="🗺️", url_path="Market_Map"),
-    ]
+        st.Page(home, title="Home", default=True),
+        st.Page("app_pages/1_Risk_Monitor.py", title="Risk Monitor", url_path="Risk_Monitor"),
+        st.Page("app_pages/2_Meeting_Brief.py", title="Meeting Brief", url_path="Meeting_Brief"),
+        st.Page("app_pages/3_Market_Map.py", title="Market Map", url_path="Market_Map"),
+    ],
+    position="top",
 )
 navigation.run()

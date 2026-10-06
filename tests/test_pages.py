@@ -35,6 +35,8 @@ def test_landing_page_renders() -> None:
     assert any("Zefix" in i.value for i in at.info)
     assert len(at.get("image")) == 3
     assert any("Yousif Bag" in m.value for m in at.markdown)
+    assert any(s.value == "Why I built this" for s in at.subheader)
+    assert not any(s.value in {"The problem", "The solution"} for s in at.subheader)
 
 
 def test_meeting_brief_page_guards_export(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -25,7 +25,7 @@ TYPE_COLORS = {"lawyer": "#1e3a5f", "fiduciary": "#3b6ea5", "notary": "#64748b"}
 TYPE_LABELS = {"lawyer": "Lawyer", "fiduciary": "Fiduciary", "notary": "Notary"}
 
 st.set_page_config(page_title=f"Market Map · {APP_NAME}", layout="wide")
-st.warning(DISCLAIMER, icon="⚠️")
+st.warning(DISCLAIMER)
 st.title("LFN Market Map")
 st.caption("Law, fiduciary and notary firms in Geneva and Vaud. A prospecting map, not a client list.")
 

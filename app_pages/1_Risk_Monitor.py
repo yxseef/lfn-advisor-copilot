@@ -62,7 +62,7 @@ def style_overview(df: pd.DataFrame) -> pd.io.formats.style.Styler:
     )
 
 
-st.warning(DISCLAIMER, icon="⚠️")
+st.warning(DISCLAIMER)
 st.title("Risk Monitor")
 st.caption(
     "Fictional LFN client portfolios valued with real market data, in CHF. "

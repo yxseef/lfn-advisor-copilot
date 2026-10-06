@@ -59,13 +59,11 @@ def _render_draft(draft: BriefDraft, reviewed: bool, reviewed_at: str | None) ->
         st.warning(
             f"{BANNER}. {DRAFT_NOTICE} An advisor has marked this draft as reviewed. "
             "The file still carries this banner.",
-            icon="📝",
         )
     else:
         st.warning(
             f"{BANNER}. {DRAFT_NOTICE} "
             "Export stays locked until you press Reviewed by advisor.",
-            icon="📝",
         )
     if draft.fallback_reason:
         st.info(draft.fallback_reason)
@@ -291,7 +289,7 @@ None of this is investment advice, and every client is fictional.
 
 _init_state()
 
-st.warning(DISCLAIMER, icon="⚠️")
+st.warning(DISCLAIMER)
 st.title("Meeting Brief")
 st.caption(
     "A pre-meeting draft for one fictional LFN client. "

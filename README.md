@@ -25,6 +25,10 @@ has no link to any bank.
 | **Meeting Brief (AI)** | A one-page pre-meeting draft for one client. The AI writes the narrative, the risk engine writes the figures, and the advisor must approve the draft before export. |
 | **LFN Market Map** | Law, fiduciary and notary firms in Geneva and Vaud on a map, with a prospect score whose weights the advisor sets. The public demo uses fictional firms (see [Limits](#limits)). |
 
+### Home
+
+![Home: top navigation bar, project summary and the three modules](docs/screenshots/home.png)
+
 ### Risk Monitor
 
 ![Risk Monitor: book overview, one row per fictional client coloured by its most severe alert](docs/screenshots/risk_monitor.png)
@@ -53,6 +57,11 @@ The Meeting Brief is the only module that calls a language model, and the guardr
    capped at five per session, and the session journal records the time, prompt version, client and review status,
    never the brief, the note or the key.
 
+## How this was built
+
+I designed the project, wrote the specifications and validated the formulas. The code was written with an AI
+assistant (Claude in Cursor), under my control.
+
 ---
 
 ## Details for technical readers
@@ -60,7 +69,8 @@ The Meeting Brief is the only module that calls a language model, and the guardr
 ### Architecture
 
 ```
-app.py               entrypoint: st.navigation and the Home page
+app.py               entrypoint: top navigation, shared style, Home page
+assets/              text wordmark shown in the navigation bar
 app_pages/           Streamlit pages (UI only)
   1_Risk_Monitor.py
   2_Meeting_Brief.py
