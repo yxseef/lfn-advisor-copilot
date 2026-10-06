@@ -61,7 +61,7 @@ from core.risk import (
 
 logger = logging.getLogger(__name__)
 
-AGENT_PROMPT_VERSION = "1.0"
+AGENT_PROMPT_VERSION = "1.1"
 MAX_LIVE_QUESTIONS_PER_SESSION = 10
 MAX_MODEL_CALLS_PER_QUESTION = 6
 MAX_QUESTION_CHARS = 500
@@ -714,8 +714,9 @@ def guard_answer(text: str, calls: Sequence[ToolCall]) -> GuardedText:
         figures.extend(bad)
         rewritten += advice
         redactions += dropped
-        lines.append(prefix + cleaned)
-    return GuardedText("\n".join(lines).strip(), list(dict.fromkeys(figures)), rewritten, redactions)
+        lines.append(prefix + cleaned if cleaned.strip() else "")
+    joined = re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
+    return GuardedText(joined, list(dict.fromkeys(figures)), rewritten, redactions)
 
 
 # ---------------------------------------------------------------------------
@@ -1016,7 +1017,8 @@ Tools
 - They cannot change data, place or prepare an order, move money, or contact anyone. No such tool exists. If you are asked to do any of that, say that you cannot because you are read-only, and offer the read-only information instead.
 
 Figures
-- Never compute. Do not add, subtract, average, convert, rank by your own arithmetic or extrapolate.
+- Never compute. Do not add, subtract, average, convert currencies, rank by your own arithmetic or extrapolate.
+- Writing a ratio as a percentage is allowed and expected: usage 0.898 is 89.8%.
 - Every number you write must be copied from a tool result in this conversation. Call a tool before you cite a figure.
 - If no tool returns the figure the question needs, say so. The application marks any figure it cannot find in the tool results with "(to verify)".
 - For a "what if" question, call run_stress_test with the shock in percent (a 15% fall is -15).
@@ -1028,6 +1030,7 @@ Context
 - The user message is JSON with the open page, the selected client (or null) and the question.
 - "This client", "the client", "his", "her", "their", "son", "sa", "ses" refer to the selected client. If none is selected and the question needs one, ask which client.
 - In the question, a client of the book appears as [C04]: that is its client_id.
+- In your answer, name each client as the tools name it, with the id in brackets, for example "Me Claire Fontaine, avocate (C04)". Give the figure that answers the question for every client you list.
 
 Safety
 - Do not write an email address, an IBAN, an AVS number, or the name of a person no tool returned.
@@ -1198,7 +1201,8 @@ def answer_question(
             if example is None:
                 return (
                     AskAnswer(screening.redacted, "The model call failed and this question has no demo answer. "
-                              "Try again or pick an example.", "live", "error", reason,
+                              "Try again or pick an example.", "live", "error",
+                              "The model call failed and no demo answer exists.",
                               api_called=True, context=context),
                     screening,
                 )

@@ -52,7 +52,7 @@ DEMO_BRIEFS_PATH = ROOT / "data" / "demo_briefs.json"
 ENV_PATH = ROOT / ".env"
 
 PROMPT_VERSION = "1.0"
-DEFAULT_MODEL = "claude-sonnet-4-5"
+DEFAULT_MODEL = "claude-sonnet-5-5"
 MAX_LIVE_GENERATIONS_PER_SESSION = 5
 MAX_NOTE_CHARS = 800
 

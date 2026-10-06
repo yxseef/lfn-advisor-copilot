@@ -121,7 +121,7 @@ The pages folder is called `app_pages/`, not `pages/`. With a `pages/` folder, S
 
 ### Meeting Brief pipeline
 
-One Anthropic call (`claude-sonnet-4-5` by default) through `core/llm.py`. The answer must be JSON that matches a
+One Anthropic call (`claude-sonnet-5-5` by default) through `core/llm.py`. The answer must be JSON that matches a
 pydantic schema. Invalid JSON, a schema failure or an API error falls back to the pre-written brief and the page says
 so. Pre-written text lives in `data/demo_briefs.json` and contains no digits, so figures are always today's.
 
