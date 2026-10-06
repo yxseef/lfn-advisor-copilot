@@ -17,8 +17,13 @@ TAGLINE = (
     "A prototype assistant for LFN client advisors: it monitors portfolio risk, "
     "prepares meetings with guardrailed AI, answers questions about the book, and helps prioritise prospects."
 )
-# Placeholder until the author supplies the text. Leave as None to show the marked placeholder.
-WHY_I_BUILT_THIS: str | None = None
+WHY_I_BUILT_THIS: str | None = (
+    "Internship applications often ask candidates to show how AI can improve outcomes. Rather than describe it "
+    "in a cover letter, I decided to build it. I chose one specific desk, advisors serving lawyers, fiduciaries "
+    "and notaries, and asked a simple question: what slows them down, and what could a tool do about it without "
+    "taking judgement away from them? This prototype is my answer: real risk analytics, an AI that can read but "
+    "never act, and every number traceable to its source."
+)
 
 # Applied to every page because the entrypoint runs before each page.
 STYLE = """
