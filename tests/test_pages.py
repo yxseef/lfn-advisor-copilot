@@ -30,6 +30,7 @@ def test_landing_page_renders() -> None:
     assert not at.exception
     assert any("not investment advice" in w.value for w in at.warning)
     assert any("Available" in m.value and "Meeting Brief" in m.value for m in at.markdown)
+    assert any("Available" in m.value and "Market Map" in m.value for m in at.markdown)
     assert any("Yousif Bag" in m.value for m in at.markdown)
 
 
@@ -69,3 +70,16 @@ def test_risk_monitor_renders_for_every_client() -> None:
     for name in select.options:
         select.set_value(name.split("  ·  ")[0]).run()
         assert not at.exception, name
+
+
+def test_market_map_page_shows_the_fictional_example(monkeypatch: pytest.MonkeyPatch) -> None:
+    def fail(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("geocoder should use the local cache")
+
+    monkeypatch.setattr("core.market_map.fetch_commune", fail)
+    at = AppTest.from_file(str(ROOT / "pages" / "3_Market_Map.py"), default_timeout=60).run()
+    assert not at.exception, at.exception
+    assert any("not investment advice" in w.value for w in at.warning)
+    assert any("Fictional example" in i.value for i in at.info)
+    assert any("Methodology & limits" in s.value for s in at.subheader)
+    assert any("Yousif Bag" in m.value and "LinkedIn" in m.value for m in at.markdown)

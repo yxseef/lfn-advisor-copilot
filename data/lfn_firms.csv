@@ -1,0 +1,5 @@
+# Replace the fictional example by filling this file. One firm per row.
+# Columns: nom, type (lawyer, fiduciary or notary), forme_juridique, commune, canton (GE or VD), date_inscription (YYYY-MM-DD), statut.
+# Canton may be left blank when the commune is already in data/commune_geocodes.csv.
+# Registry fields only. Do not add personal data.
+nom,type,forme_juridique,commune,canton,date_inscription,statut

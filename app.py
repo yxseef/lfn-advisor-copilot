@@ -34,12 +34,13 @@ A small toolkit that automates the monitoring work and leaves judgement to the a
 |---|---|---|
 | **Risk Monitor** | Values fictional portfolios with real market data; volatility, VaR, concentration, Lombard LTV, profile compliance, stress tests and automatic alerts. | Available |
 | **Meeting Brief (AI)** | Structured pre-meeting briefing for one fictional client, with guardrails and human review. | Available |
-| **LFN Market Map** | Maps law, fiduciary and notary firms in Geneva and Vaud for business development. | Planned |
+| **LFN Market Map** | Maps law, fiduciary and notary firms in Geneva and Vaud for business development. | Available |
 """
     )
 
     st.page_link("pages/1_Risk_Monitor.py", label="Open the Risk Monitor", icon="📊")
     st.page_link("pages/2_Meeting_Brief.py", label="Open the Meeting Brief", icon="📝")
+    st.page_link("pages/3_Market_Map.py", label="Open the Market Map", icon="🗺️")
 
     st.divider()
     st.caption(
@@ -55,6 +56,7 @@ navigation = st.navigation(
         st.Page(home, title="Home", default=True, icon="🏠"),
         st.Page("pages/1_Risk_Monitor.py", title="Risk Monitor", icon="📊", url_path="Risk_Monitor"),
         st.Page("pages/2_Meeting_Brief.py", title="Meeting Brief", icon="📝", url_path="Meeting_Brief"),
+        st.Page("pages/3_Market_Map.py", title="Market Map", icon="🗺️", url_path="Market_Map"),
     ]
 )
 navigation.run()
