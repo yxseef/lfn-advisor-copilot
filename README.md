@@ -3,7 +3,7 @@
 *Student prototype — fictional data — not investment advice.*
 
 **A prototype assistant for LFN client advisors: it monitors portfolio risk, prepares meetings with guardrailed AI,
-and helps prioritise prospects.**
+answers questions about the book, and helps prioritise prospects.**
 
 **Live demo:** [lfn-advisor-copilot.streamlit.app](https://lfn-advisor-copilot.streamlit.app) — no login, no API key needed.
 
@@ -16,18 +16,19 @@ In Swiss private banking, **LFN** teams serve **lawyers, fiduciaries and notarie
 accounts, and the needs of the clients they represent (estates, property deals, escrow accounts). An advisor covers
 dozens of such relationships and must spot risk early and prepare every meeting with limited time.
 
-This independent student project shows three tools for that job. Every client and firm is invented, and the project
+This independent student project shows four tools for that job. Every client and firm is invented, and the project
 has no link to any bank.
 
 | Module | What the advisor gets |
 |---|---|
 | **Risk Monitor** | Ten fictional portfolios valued every day with real market prices. Risk figures, profile limits and automatic alerts, ranked by severity. |
 | **Meeting Brief (AI)** | A one-page pre-meeting draft for one client. The AI writes the narrative, the risk engine writes the figures, and the advisor must approve the draft before export. |
+| **Ask the Book (AI)** | Questions about the whole book in plain English, from a full page or the Ask button on every page. The AI picks read-only risk functions and cites the figures they return. It cannot trade, change data or contact anyone. |
 | **LFN Market Map** | Law, fiduciary and notary firms in Geneva and Vaud on a map, with a prospect score whose weights the advisor sets. The public demo uses fictional firms (see [Limits](#limits)). |
 
 ### Home
 
-![Home: top navigation bar, project summary and the three modules](docs/screenshots/home.png)
+![Home: top navigation bar, project summary and the four modules](docs/screenshots/home.png)
 
 ### Risk Monitor
 
@@ -37,13 +38,21 @@ has no link to any bank.
 
 ![Meeting Brief: AI-generated draft banner, figures from the risk engine, probable needs](docs/screenshots/meeting_brief.png)
 
+### Ask the Book
+
+![Ask the Book: demo answer on margin calls after a 15% equity fall, with the stress-test tool call and its result](docs/screenshots/ask_the_book.png)
+
+The same assistant opens as a compact window from the Ask button, here on a client's Risk Monitor page:
+
+![Ask window on the Risk Monitor: "this client's main risk" answered for the selected client](docs/screenshots/ask_window.png)
+
 ### LFN Market Map
 
 ![Market Map: fictional firms placed on Geneva and Vaud commune centres, coloured by profession](docs/screenshots/market_map.png)
 
 ## Responsible AI
 
-The Meeting Brief is the only module that calls a language model, and the guardrails are on by default:
+Two modules can call a language model, the Meeting Brief and Ask the Book. The guardrails are on by default:
 
 1. **Only fictional data goes in.** The prompt contains one fictional client from the Risk Monitor. A free-text note
    with a name, an email, an IBAN or a Swiss AVS number is blocked before any call.
@@ -56,6 +65,9 @@ The Meeting Brief is the only module that calls a language model, and the guardr
 5. **No key, no cost.** Without an API key the page uses pre-written text and makes no call. With a key, live calls are
    capped at five per session, and the session journal records the time, prompt version, client and review status,
    never the brief, the note or the key.
+6. **Ask the Book only reads.** Its five tools read the Risk Monitor. No tool writes, trades or sends anything, so a
+   request to sell or to contact a client is refused with an explanation. The same input filter applies, every answer
+   carries an "AI-generated" banner, and figures that no tool returned are marked "(to verify)".
 
 ## How this was built
 
@@ -75,10 +87,13 @@ app_pages/           Streamlit pages (UI only)
   1_Risk_Monitor.py
   2_Meeting_Brief.py
   3_Market_Map.py
+  4_Ask_the_Book.py
+  ask_ui.py          Ask button and chat window shared by every page (not a page)
 core/                pure, typed functions, no UI
   portfolios.py      fictional clients and portfolios (fixed seed)
   risk.py            prices, risk metrics, limits, stress tests, alerts
   llm.py             LLM wrapper, guardrails, demo mode, PDF/Markdown export
+  agent.py           Ask the Book: read-only tools, input screen, tool-use loop, demo answers
   market_map.py      firm cleaning, keyword classification, geocoding, prospect score
 data/                price fallback, demo briefs, firm file, commune geocode cache
 docs/screenshots/    images used here and on the Home page
@@ -110,6 +125,39 @@ One Anthropic call (`claude-sonnet-4-5` by default) through `core/llm.py`. The a
 pydantic schema. Invalid JSON, a schema failure or an API error falls back to the pre-written brief and the page says
 so. Pre-written text lives in `data/demo_briefs.json` and contains no digits, so figures are always today's.
 
+### Ask the Book agent
+
+The model chooses functions; the application runs them. `core/agent.py` handles one question in four steps:
+
+1. **Screen.** Fictional client names from the book are replaced by their id. The question is then refused before
+   any call if it contains an email, an IBAN, an AVS number or another person's name, tries to override the
+   instructions ("ignore your instructions"), asks for an action (sell, buy, transfer, send, contact) or asks for a
+   buy or sell recommendation. The refusal explains why.
+2. **Call tools.** With a key, the question, the open page and the selected client go to Anthropic with the tool
+   list. The model answers with tool calls, the application runs them on the Risk Monitor book and sends the results
+   back, at most 6 model calls per question.
+3. **Check the answer.** Every number in the text must appear in a tool's parameters or results, otherwise it is
+   marked "(to verify)". A sentence that reads like a trading instruction is rewritten as a discussion topic.
+4. **Log.** The session journal stores the time, the screened question (ids instead of names, withheld if it held
+   personal data), the tools called, the mode (demo or live), the status and the prompt version. Not the answer.
+
+| Tool | What it returns |
+|---|---|
+| `list_clients` | Clients with type, account, profile, AUM, alert status and whether they have a Lombard loan, with optional filters |
+| `list_alerts` | Open alerts, filtered by severity, profile, client or category |
+| `get_client_risk` | One client's risk figures, profile limits, alerts and main risk |
+| `run_stress_test` | Any equity, EUR, USD or rate shock (bounded), P&L per client and who would face a margin call |
+| `get_lombard_status` | Loan, lending value, usage, free margin and the uniform fall that would trigger a margin call |
+
+Without a key, five example questions run in demo mode: the wording is pre-written, but the tools are called when
+the answer is shown, so the figures are today's. Two of the examples are refusals. A free question in demo mode gets
+a short note instead of an answer. With a key, live questions are capped at 10 per session; past the cap, the demo
+answer is used when one exists.
+
+The Ask button is a Streamlit popover fixed at the bottom right by CSS. It stays open across reruns and fits a
+390-pixel phone screen. The window shows the last answer with its tools collapsed; the full page keeps the
+conversation, the journal and the method.
+
 ### Market Map score
 
 Score = 100 × weighted average of four criteria, each between 0 and 1. The weights are sliders on the page.
@@ -140,6 +188,13 @@ status (active, in liquidation) is shown but not scored.
   instantaneous and applied one at a time.
 - **AI checks are lexical.** The number check can accept a real figure used in the wrong sentence. The model can be
   wrong in a sentence with no figure. Review is a gate, not a guarantee.
+- **Ask the Book filters are patterns.** They can miss an unusual phrasing of a request to trade, and they can refuse
+  a harmless question that looks like a name or an order. The "(to verify)" check confirms that a number came from a
+  tool, not that it was used for the right concept. Demo mode answers only the examples. The journal lasts for the
+  browser session, and there is no login.
+- **The floating window depends on Streamlit internals.** Its size and position use CSS on a Streamlit test id
+  (`stPopoverBody`). A Streamlit upgrade can break the layout, which is why `requirements.txt` pins Streamlit to the
+  tested 1.x line (1.65 or later, below 2). The full Ask the Book page does not depend on it.
 
 ### Run locally
 
@@ -157,5 +212,5 @@ Refresh the price fallback with `python -m scripts.update_price_fallback`.
 
 ### Tech stack
 
-Python · Streamlit · pandas · NumPy · Plotly · yfinance · Anthropic API (optional) · pydantic · fpdf2 ·
+Python · Streamlit · pandas · NumPy · Plotly · yfinance · Anthropic API with tool use (optional) · pydantic · fpdf2 ·
 swisstopo geo.admin.ch · pytest · Streamlit Community Cloud.

@@ -230,6 +230,9 @@ _NAME_LABEL = re.compile(
 )
 _INJECTION = re.compile(
     r"(ignore\s+(?:all\s+|any\s+)?(?:previous|prior|above)\s+instructions"
+    r"|(?:ignore|forget|disregard|override|bypass)\s+(?:all\s+|any\s+)?(?:of\s+)?(?:your|the|these|my|its)\s+"
+    r"(?:\w+\s+)?(?:instructions|rules|guardrails|guidelines|restrictions)"
+    r"|(?:ignore|oublie|oubliez|ignorez)\s+(?:toutes\s+)?(?:tes|vos|les|ces)\s+(?:\w+\s+)?(?:instructions|consignes|règles|regles)"
     r"|disregard\s+the\s+system\s+prompt"
     r"|you\s+are\s+now"
     r"|reveal\s+(?:the\s+|your\s+)?system\s+prompt"
@@ -263,6 +266,14 @@ _PHRASE_STOPLIST = {
     "operating account",
     "client money",
     "advisor copilot",
+    "ask the book",
+    "margin call",
+    "lombard usage",
+    "lombard loan",
+    "stress test",
+    "client view",
+    "book overview",
+    "market map",
 }
 _ACRONYMS_OK = {
     "KYC", "AML", "CHF", "USD", "EUR", "LFN", "VAR", "ETF", "ETF", "IBAN",

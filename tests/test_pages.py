@@ -33,10 +33,43 @@ def test_landing_page_renders() -> None:
     assert any("Available" in m.value and "Market Map" in m.value for m in at.markdown)
     assert any("guardrailed AI" in m.value for m in at.markdown)
     assert any("Zefix" in i.value for i in at.info)
-    assert len(at.get("image")) == 3
+    assert any("Ask the Book" in m.value and "read-only" in m.value for m in at.markdown)
+    assert len(at.get("image")) == 4
     assert any("Yousif Bag" in m.value for m in at.markdown)
     assert any(s.value == "Why I built this" for s in at.subheader)
     assert not any(s.value in {"The problem", "The solution"} for s in at.subheader)
+
+
+def test_floating_ask_window_answers_on_home(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("core.llm.resolve_api_key", lambda: None)
+    at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=90).run()
+    assert not at.exception, at.exception
+    at.chat_input(key="ask_fab_input").set_value("Which conservative clients breach a limit?").run()
+    assert not at.exception, at.exception
+    assert any("AI-generated" in m.value and "Demo mode" in m.value for m in at.markdown)
+    assert any(e.label.startswith("Tools used (2)") for e in at.expander)
+    at.button(key="fab_example_3").click().run()
+    assert any("read-only" in m.value for m in at.markdown)
+
+
+def test_ask_the_book_page_runs_every_example(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("core.llm.resolve_api_key", lambda: None)
+    at = AppTest.from_file(str(ROOT / "app_pages" / "4_Ask_the_Book.py"), default_timeout=90).run()
+    assert not at.exception, at.exception
+    assert any("not investment advice" in w.value for w in at.warning)
+    assert any(i.value.startswith("Demo mode") for i in at.info)
+    for index in range(5):
+        at.button(key=f"page_example_{index}").click().run()
+        assert not at.exception, at.exception
+    banners = [m.value for m in at.markdown if "ask-banner" in m.value]
+    assert len(banners) == 5 and all("AI-generated" in b for b in banners)
+    assert sum("Refused" in b for b in banners) == 2
+    assert len(at.dataframe) == 1 and len(at.dataframe[0].value) == 5
+    assert list(at.dataframe[0].value["Status"]) == ["refused", "refused", "answered", "answered", "answered"]
+
+    at.selectbox(key="ask_focus_client").set_value("Me Claire Fontaine, avocate").run()
+    at.button(key="page_example_0").click().run()
+    assert any("“this client” is **Me Claire Fontaine" in m.value for m in at.markdown)
 
 
 def test_meeting_brief_page_guards_export(monkeypatch: pytest.MonkeyPatch) -> None:

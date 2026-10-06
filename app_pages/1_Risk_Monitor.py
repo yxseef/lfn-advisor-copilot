@@ -112,6 +112,7 @@ with tab_client:
         "Client",
         list(by_name),
         format_func=lambda n: f"{n}  ·  {by_name[n].status.upper()}",
+        key="rm_client",
     )
     r = by_name[name]
     c = r.client
