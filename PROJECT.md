@@ -23,8 +23,8 @@ It shows that the author understands the Client Advisor job and can use AI **exp
 
 ## Structure
 ```
-app.py                     # landing page: problem, solution, modules, disclaimer
-pages/
+app.py                     # entrypoint: st.navigation + landing page (problem, solution, modules, disclaimer)
+app_pages/                 # not "pages/": that name makes Streamlit ignore st.navigation on deep links
   1_Risk_Monitor.py
   2_Meeting_Brief.py
   3_Market_Map.py
@@ -46,7 +46,7 @@ README.md                  # English, with screenshots
 3. **LFN Market Map**: maps law, fiduciary and notary firms in Geneva and Vaud from public data and ranks prospects for business development.
 
 ## Coding standards
-- Clean, typed (type hints), commented code; small pure functions in `core/`, UI only in `pages/`
+- Clean, typed (type hints), commented code; small pure functions in `core/`, UI only in `app_pages/` and `app.py`
 - Every financial formula is documented in its docstring (definition, assumptions, limits)
 - Fixed random seed, so the demo is reproducible
 - Cache market data (`st.cache_data`) and fall back to a local CSV if yfinance fails

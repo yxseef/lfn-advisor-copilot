@@ -201,7 +201,7 @@ with tab_client:
 
     st.subheader("Value history (current holdings)")
     fig = go.Figure(go.Scatter(x=r.history.index, y=r.history.values, name="Portfolio value",
-                               line=dict(color="#0f766e")))
+                               line=dict(color="#1e3a5f")))
     if r.lombard:
         # Market value at which usage reaches 100 %, assuming today's asset mix.
         fig.add_hline(y=r.aum * r.lombard.usage, line_dash="dash", line_color="#b91c1c",

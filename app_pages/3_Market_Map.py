@@ -132,12 +132,16 @@ else:
                 "lon_display": False,
             },
             color_discrete_map={TYPE_LABELS[kind]: TYPE_COLORS[kind] for kind in FIRM_TYPES},
-            zoom=8,
-            center={"lat": 46.35, "lon": 6.5},
-            map_style="open-street-map",
+            zoom=8.4,
+            center={"lat": 46.42, "lon": 6.52},
+            map_style="carto-positron",
             height=520,
         )
-        fig.update_layout(margin=dict(l=0, r=0, t=0, b=0), legend_title_text="Type")
+        fig.update_traces(marker=dict(size=12, opacity=0.9))
+        fig.update_layout(
+            margin=dict(l=0, r=0, t=0, b=0),
+            legend=dict(title="Type", x=0.01, y=0.99, bgcolor="rgba(255,255,255,0.85)"),
+        )
         st.plotly_chart(fig, width="stretch")
         st.caption(
             "Each point is the commune centre from swisstopo, not the firm's address. "

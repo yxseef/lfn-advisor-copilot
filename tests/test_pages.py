@@ -31,12 +31,15 @@ def test_landing_page_renders() -> None:
     assert any("not investment advice" in w.value for w in at.warning)
     assert any("Available" in m.value and "Meeting Brief" in m.value for m in at.markdown)
     assert any("Available" in m.value and "Market Map" in m.value for m in at.markdown)
+    assert any("guardrailed AI" in m.value for m in at.markdown)
+    assert any("Zefix" in i.value for i in at.info)
+    assert len(at.get("image")) == 3
     assert any("Yousif Bag" in m.value for m in at.markdown)
 
 
 def test_meeting_brief_page_guards_export(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("core.llm.resolve_api_key", lambda: None)
-    at = AppTest.from_file(str(ROOT / "pages" / "2_Meeting_Brief.py"), default_timeout=90).run()
+    at = AppTest.from_file(str(ROOT / "app_pages" / "2_Meeting_Brief.py"), default_timeout=90).run()
     assert not at.exception, at.exception
     assert any("not investment advice" in w.value for w in at.warning)
     assert any("How this AI works" in s.value for s in at.subheader)
@@ -61,7 +64,7 @@ def test_meeting_brief_page_guards_export(monkeypatch: pytest.MonkeyPatch) -> No
 
 
 def test_risk_monitor_renders_for_every_client() -> None:
-    at = AppTest.from_file(str(ROOT / "pages" / "1_Risk_Monitor.py"), default_timeout=60).run()
+    at = AppTest.from_file(str(ROOT / "app_pages" / "1_Risk_Monitor.py"), default_timeout=60).run()
     assert not at.exception
     assert any("not investment advice" in w.value for w in at.warning)
     assert any("Yousif Bag" in m.value for m in at.markdown)
@@ -77,7 +80,7 @@ def test_market_map_page_shows_the_fictional_example(monkeypatch: pytest.MonkeyP
         raise AssertionError("geocoder should use the local cache")
 
     monkeypatch.setattr("core.market_map.fetch_commune", fail)
-    at = AppTest.from_file(str(ROOT / "pages" / "3_Market_Map.py"), default_timeout=60).run()
+    at = AppTest.from_file(str(ROOT / "app_pages" / "3_Market_Map.py"), default_timeout=60).run()
     assert not at.exception, at.exception
     assert any("not investment advice" in w.value for w in at.warning)
     assert any("Fictional example" in i.value for i in at.info)
