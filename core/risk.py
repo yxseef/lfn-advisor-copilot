@@ -271,7 +271,7 @@ def _as_array(returns: pd.Series | np.ndarray | Sequence[float]) -> np.ndarray:
 
 
 def annualized_volatility(returns: pd.Series | np.ndarray, periods_per_year: int = TRADING_DAYS) -> float:
-    """Annualized volatility.
+    """Annualised volatility.
 
     Definition: σ_annual = σ_daily × √252, where σ_daily is the sample
     standard deviation (ddof=1) of daily returns.
@@ -503,7 +503,7 @@ def check_profile(conc: Concentration, volatility: float, profile: RiskProfile) 
         (single, conc.max_security_weight, lim.max_single_security),
         ("Gold allocation", gold, lim.max_gold),
         ("Foreign-currency exposure", conc.non_chf_weight, lim.max_non_chf),
-        ("Annualized volatility", volatility, lim.max_volatility),
+        ("Annualised volatility", volatility, lim.max_volatility),
     ]
     return [ComplianceCheck(rule, value, limit, limit_status(value, limit)) for rule, value, limit in checks]
 

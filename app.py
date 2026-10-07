@@ -19,13 +19,29 @@ TAGLINE = (
     "A prototype assistant for LFN client advisors: it monitors portfolio risk, "
     "prepares meetings with guardrailed AI, answers questions about the book, and helps prioritise prospects."
 )
-WHY_I_BUILT_THIS: str | None = (
+WHY_I_BUILT_THIS = (
     "Internship applications often ask candidates to show how AI can improve outcomes. Rather than describe it "
     "in a cover letter, I decided to build it. I chose one specific desk, advisors serving lawyers, fiduciaries "
     "and notaries, and asked a simple question: what slows them down, and what could a tool do about it without "
     "taking judgement away from them? This prototype is my answer: real risk analytics, an AI that can read but "
     "never act, and every number traceable to its source."
 )
+# Same text as the top of README.md.
+WHAT_IT_DEMONSTRATES = """
+- **Understanding of the LFN business:** the tool is built around the real needs of advisors serving lawyers,
+  fiduciaries and notaries: firm accounts, Lombard credit, estates and prospecting.
+- **Portfolio risk management:** historical VaR and Expected Shortfall, risk contributions, profile limits, Lombard
+  lending values and margin-call distance, and configurable stress tests, all computed from real market data.
+- **Responsible use of AI:** the AI never computes figures or takes actions. It calls read-only tools, every number
+  it writes must come from a tool output or is flagged "to verify", inputs are screened for personal data, and an
+  advisor must review every draft before export.
+- **Compliance awareness:** fictional data only, no investment advice, KYC and source-of-funds reminders, and an
+  audit log of AI interactions.
+- **Engineering quality:** Python, automated tests, a demo mode with no external dependency, and continuous
+  deployment from GitHub.
+- **Using AI to deliver faster:** I designed the product, wrote the specifications and validated every formula; the
+  code was written with an AI coding assistant under my supervision.
+"""
 
 # Applied to every page because the entrypoint runs before each page.
 STYLE = """
@@ -99,10 +115,10 @@ client mandates. The copilot does the monitoring and the preparation; the adviso
                 st.page_link(page, label=f"Open {label}")
 
     st.subheader("Why I built this")
-    if WHY_I_BUILT_THIS:
-        st.markdown(WHY_I_BUILT_THIS)
-    else:
-        st.caption("[Placeholder — text to be provided by Yousif Bag.]")
+    st.markdown(WHY_I_BUILT_THIS)
+
+    st.subheader("What this project demonstrates")
+    st.markdown(WHAT_IT_DEMONSTRATES)
 
     st.subheader("Responsible AI")
     st.markdown(

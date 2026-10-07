@@ -842,7 +842,7 @@ def _compose_summary(calls: list[ToolCall], _ctx: AskContext) -> str:
         f"{r['risk_profile']} risk profile. Assets under management: {fmt_chf(r['aum_chf'])}. "
         f"Risk Monitor status: {r['status'].upper()}.",
         "",
-        f"- Annualized volatility {fmt_pct(r['volatility'])}, against a {r['risk_profile']} limit of "
+        f"- Annualised volatility {fmt_pct(r['volatility'])}, against a {r['risk_profile']} limit of "
         f"{fmt_pct(limits['max_volatility'])}.",
         f"- Historical VaR 95% 1-day {fmt_chf(r['var_95_1d_chf'])}; expected shortfall 95% 1-day "
         f"{fmt_chf(r['es_95_1d_chf'])}.",
@@ -997,11 +997,7 @@ def _run_demo(
     )
 
 
-DEMO_ONLY_TEXT = (
-    "Demo mode answers the example questions only, because no model is connected. "
-    "Pick one of the examples, or add an Anthropic API key to ask your own question. "
-    "The input filter above still ran on your question, and it passed."
-)
+DEMO_ONLY_TEXT = "Demo mode answers only the example questions below. Pick one:"
 
 
 # ---------------------------------------------------------------------------

@@ -10,6 +10,22 @@ answers questions about the book, and helps prioritise prospects.**
 Built by Yousif Bag — MSc Finance, HEC Lausanne · [GitHub](https://github.com/yxseef) ·
 [LinkedIn](https://www.linkedin.com/in/yousif-bag-8002303b2/)
 
+## What this project demonstrates
+
+- **Understanding of the LFN business:** the tool is built around the real needs of advisors serving lawyers,
+  fiduciaries and notaries: firm accounts, Lombard credit, estates and prospecting.
+- **Portfolio risk management:** historical VaR and Expected Shortfall, risk contributions, profile limits, Lombard
+  lending values and margin-call distance, and configurable stress tests, all computed from real market data.
+- **Responsible use of AI:** the AI never computes figures or takes actions. It calls read-only tools, every number
+  it writes must come from a tool output or is flagged "to verify", inputs are screened for personal data, and an
+  advisor must review every draft before export.
+- **Compliance awareness:** fictional data only, no investment advice, KYC and source-of-funds reminders, and an
+  audit log of AI interactions.
+- **Engineering quality:** Python, automated tests, a demo mode with no external dependency, and continuous
+  deployment from GitHub.
+- **Using AI to deliver faster:** I designed the product, wrote the specifications and validated every formula; the
+  code was written with an AI coding assistant under my supervision.
+
 ## In two minutes
 
 In Swiss private banking, **LFN** teams serve **lawyers, fiduciaries and notaries**: their own wealth and firm
@@ -32,7 +48,7 @@ On a first visit, Home offers a two-minute tour that follows one fictional clien
 Lombard warning in the Risk Monitor to her meeting brief and a margin-call question in Ask the Book. Every page also
 opens with one line on what it is for and a collapsed "How to use this page".
 
-![Home: top navigation bar, project summary, the tour link and the four modules](docs/screenshots/home.png)
+![Home: top navigation bar, project summary, the tour link, the four modules, Why I built this and What this project demonstrates](docs/screenshots/home.png)
 
 ### Risk Monitor
 
@@ -154,10 +170,11 @@ The model chooses functions; the application runs them. `core/agent.py` handles 
 | `run_stress_test` | Any equity, EUR, USD or rate shock (bounded), P&L per client and who would face a margin call |
 | `get_lombard_status` | Loan, lending value, usage, free margin and the uniform fall that would trigger a margin call |
 
-Without a key, five example questions run in demo mode: the wording is pre-written, but the tools are called when
-the answer is shown, so the figures are today's. Two of the examples are refusals. A free question in demo mode gets
-a short note instead of an answer. With a key, live questions are capped at 10 per session; past the cap, the demo
-answer is used when one exists.
+Without a key, five example questions run in demo mode, plus "What is this client's main risk?" when a client is
+selected. They are shown as buttons, open in the Ask window and on the page. The wording is pre-written, but the
+tools are called when the answer is shown, so the figures are today's. Two of the examples are refusals. A free
+question in demo mode gets a one-line reply followed by the example buttons. With a key, live questions are capped
+at 10 per session; past the cap, the demo answer is used when one exists.
 
 The Ask button is a Streamlit popover fixed at the bottom right by CSS. It stays open across reruns and fits a
 390-pixel phone screen. The window shows the last answer with its tools collapsed; the full page keeps the

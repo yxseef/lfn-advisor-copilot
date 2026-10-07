@@ -191,7 +191,7 @@ def test_conservative_profile_equity_breach() -> None:
     assert checks["Equity allocation"].status == "breach"  # 40 % > 35 %
     assert checks["Largest single equity"].status == "breach"  # 20 % > 10 %
     assert checks["Foreign-currency exposure"].status == "ok"
-    assert checks["Annualized volatility"].status == "ok"
+    assert checks["Annualised volatility"].status == "ok"
     # Same portfolio is fine for a dynamic profile, except the 20 % single line.
     dyn = {c.rule.split(" (")[0]: c for c in check_profile(concentration(pos), 0.05, "dynamic")}
     assert dyn["Equity allocation"].status == "ok"

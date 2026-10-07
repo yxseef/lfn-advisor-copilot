@@ -1099,7 +1099,7 @@ def _figures_lines(facts: dict[str, Any]) -> list[str]:
         "These lines are written by the application from the risk engine. The model does not write them.",
         "",
         f"- Assets under management: {displays['aum']}",
-        f"- Annualized volatility: {displays['volatility']}",
+        f"- Annualised volatility: {displays['volatility']}",
         f"- Historical VaR 95% 1-day: {displays['var_1d']}",
         f"- Historical VaR 95% 10-day: {displays['var_10d']}",
         f"- Expected shortfall 95% 1-day: {displays['es_1d']}",

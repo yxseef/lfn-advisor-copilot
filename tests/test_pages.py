@@ -38,7 +38,9 @@ def test_landing_page_renders() -> None:
     assert len(at.get("image")) == 4
     assert any("Yousif Bag" in m.value for m in at.markdown)
     assert any(s.value == "Why I built this" for s in at.subheader)
+    assert any(s.value == "What this project demonstrates" for s in at.subheader)
     assert not any(s.value in {"The problem", "The solution"} for s in at.subheader)
+    assert not any("Placeholder" in c.value for c in at.caption)
 
 
 def test_welcome_window_opens_once_and_from_the_link() -> None:
@@ -121,6 +123,19 @@ def test_floating_ask_window_answers_on_home(monkeypatch: pytest.MonkeyPatch) ->
     assert any(e.label.startswith("Tools used (2)") for e in at.expander)
     at.button(key="fab_example_3").click().run()
     assert any("read-only" in m.value for m in at.markdown)
+
+
+def test_demo_examples_are_open_and_follow_a_free_question(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("core.llm.resolve_api_key", lambda: None)
+    at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=90).run()
+    assert not any(e.label == "Example questions" for e in at.expander)
+    assert any(b.key == "fab_example_0" for b in at.button)
+    at.chat_input(key="ask_fab_input").set_value("Which clients hold Apple?").run()
+    assert not at.exception, at.exception
+    assert any(m.value.startswith("Demo mode answers only the example questions") for m in at.markdown)
+    at.button(key="fab_after_0_example_0").click().run()
+    assert not at.exception, at.exception
+    assert any(e.label.startswith("Tools used (1)") for e in at.expander)
 
 
 def test_ask_the_book_page_runs_every_example(monkeypatch: pytest.MonkeyPatch) -> None:

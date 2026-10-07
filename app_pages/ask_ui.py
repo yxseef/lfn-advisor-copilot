@@ -40,7 +40,8 @@ STYLE = """
   max-height: min(72vh, 680px); overflow-y: auto;
 }
 .st-key-ask_window [data-testid="stVerticalBlock"] { gap: 0.6rem; }
-.st-key-ask_window [data-testid="stButton"] button { justify-content: flex-start; text-align: left; }
+.st-key-ask_window [data-testid="stButton"] button,
+.st-key-ask_window [data-testid="stButton"] button * { justify-content: flex-start; text-align: left; }
 .ask-banner {
   background: #f1f5f9; border-left: 3px solid #1e3a5f; border-radius: 4px; padding: 0.4rem 0.65rem;
   color: #334155; font-size: 0.78rem; line-height: 1.35; margin-bottom: 0.6rem;
@@ -144,9 +145,20 @@ def _escape(text: str) -> str:
     return text.replace("$", "\\$")
 
 
-def render_turn(turn: dict[str, Any], index: int, *, compact: bool, expanded: bool) -> None:
+def render_turn(
+    turn: dict[str, Any], index: int, *, compact: bool, expanded: bool, page: str, latest: bool
+) -> None:
     answer: AskAnswer = turn["answer"]
     prefix = "fab" if compact else "page"
+    if answer.status == "demo_only":
+        with st.container(key=f"ask_q_{prefix}_{index}"):
+            st.caption("You asked")
+            st.markdown(_escape(turn["question"]))
+        with st.container(border=True):
+            st.markdown(answer.text)
+            if latest:
+                render_examples(page, current_context(page), f"{prefix}_after_{index}", stretch=compact)
+        return
     with st.container(key=f"ask_q_{prefix}_{index}"):
         st.caption("You asked")
         st.markdown(_escape(turn["question"]))
@@ -202,9 +214,16 @@ def render_fab(page: str) -> None:
                     max_chars=500,
                 )
                 history = st.session_state.ask_history
-                if history:
-                    render_turn(history[-1], len(history) - 1, compact=True, expanded=False)
-                with st.expander("Example questions", expanded=not history):
+                last = history[-1] if history else None
+                if last:
+                    render_turn(last, len(history) - 1, compact=True, expanded=False, page=page, latest=True)
+                if last and last["answer"].status == "demo_only":
+                    st.page_link(ASK_PAGE, label="Open full view")
+                elif not llm.resolve_api_key():
+                    st.markdown("**Example questions**")
                     render_examples(page, context, "fab", stretch=True)
+                else:
+                    with st.expander("Example questions", expanded=not history):
+                        render_examples(page, context, "fab", stretch=True)
                 if not history:
                     st.page_link(ASK_PAGE, label="Open full view")

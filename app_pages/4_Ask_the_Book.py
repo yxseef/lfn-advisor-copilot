@@ -85,7 +85,8 @@ history = st.session_state.ask_history
 if not history:
     st.caption("No question yet. Pick an example or type a question in the box at the bottom of the page.")
 for index, turn in enumerate(history):
-    render_turn(turn, index, compact=False, expanded=index == len(history) - 1)
+    latest = index == len(history) - 1
+    render_turn(turn, index, compact=False, expanded=latest, page=ASK_TITLE, latest=latest)
 if history and st.button("Clear conversation", key="ask_clear"):
     st.session_state.ask_history = []
     st.rerun()

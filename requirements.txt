@@ -6,4 +6,5 @@ yfinance>=0.2.50
 pydantic>=2.6
 anthropic>=0.40
 fpdf2>=2.7
+certifi>=2024.2
 pytest>=8.0
