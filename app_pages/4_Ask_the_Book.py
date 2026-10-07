@@ -68,7 +68,7 @@ with st.container(border=True):
     st.markdown(
         f"""
 1. **Read-only.** Five tools read the Risk Monitor. None can trade, edit data or contact anyone; such requests are refused.
-2. **Figures from tools.** The model never computes. A figure that no tool returned is marked "to verify".
+2. **Figures from tools.** The model never computes. A figure that neither a tool nor your question gave is marked "to verify".
 3. **Input filter.** Emails, IBANs, AVS numbers, unknown names and attempts to override the rules are blocked before any call.
 4. **No recommendation.** Discussion topics only, never an instruction to buy or sell.
 5. **Banner, cap and journal.** Every answer is labelled "{BANNER}". Live mode stops after {MAX_LIVE_QUESTIONS_PER_SESSION} questions per session. Every question is logged below.
@@ -143,7 +143,7 @@ filter refuses such requests before the model is called, and the answer explains
 
 **What it does not guarantee.** The filters are pattern-based. They can miss an unusual phrasing, and they can
 block a harmless question that looks like a name or an order. The figure check is lexical: it confirms that
-a number came from a tool, not that it was used for the right concept. A sentence without a figure can still be
+a number came from a tool or the question, not that it was used for the right concept. A sentence without a figure can still be
 wrong. Demo mode answers only the examples. Prompt version **{AGENT_PROMPT_VERSION}**.
 """
 )

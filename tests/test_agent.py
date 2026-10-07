@@ -385,6 +385,17 @@ def _text(text: str) -> ModelReply:
     return ModelReply(text, [], [{"type": "text", "text": text}])
 
 
+def test_numbers_from_the_question_are_allowed_figures(book: list[ClientRisk]) -> None:
+    model = ScriptedModel([_text("Usage above 63.7% is the threshold you asked about. The gap is CHF 123,456.")])
+    answer, _ = answer_question("Which clients have a Lombard usage above 63.7%?", book, NO_CONTEXT,
+                                api_key=None, model=model)
+    assert answer.status == "answered"
+    assert answer.figures_to_verify == ["123,456"]
+    assert "63.7% is the threshold you asked about." in answer.text
+    client_id_only = guard_answer("She has 4 open alerts.", [], "Summarise [C04]'s situation.")
+    assert client_id_only.figures_to_verify == ["4"]
+
+
 def test_live_loop_runs_the_requested_tool_and_checks_figures(book: list[ClientRisk]) -> None:
     usage = _by_id(book, "C04").lombard.usage
     model = ScriptedModel(

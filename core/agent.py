@@ -15,7 +15,7 @@ Pipeline
 2. :func:`answer_question` — demo template, or a tool-use loop with the model.
    Both call :func:`execute_tool`, the only door to the data.
 3. :func:`guard_answer` — the Meeting Brief output checks, line by line: a
-   figure that no tool returned is marked ``(to verify)``, a sentence that
+   figure that neither a tool nor the question gave is marked ``(to verify)``, a sentence that
    reads as an order is rewritten, an email/IBAN/AVS sentence is dropped.
 4. :func:`new_ask_log_entry` — time, screened question, tools, mode, status.
 
@@ -691,14 +691,22 @@ class GuardedText:
     redactions: int
 
 
-def allowed_numbers(calls: Sequence[ToolCall]) -> list[float]:
-    """Every number in the tool arguments and results: the only allowed figures."""
-    return collect_numbers([{"params": c.params, "result": c.result} for c in calls])
+_CLIENT_ID_TOKEN = re.compile(r"\[C\d{2}\]")
 
 
-def guard_answer(text: str, calls: Sequence[ToolCall]) -> GuardedText:
+def allowed_numbers(calls: Sequence[ToolCall], question: str = "") -> list[float]:
+    """Every number in the tool arguments and results, and in the user's question: the only allowed figures.
+
+    The question is the screened text; its client ids such as ``[C04]`` are not figures and are skipped.
+    """
+    return collect_numbers(
+        [{"params": c.params, "result": c.result} for c in calls] + [_CLIENT_ID_TOKEN.sub(" ", question)]
+    )
+
+
+def guard_answer(text: str, calls: Sequence[ToolCall], question: str = "") -> GuardedText:
     """Run the Meeting Brief output checks on each line, keeping the line breaks."""
-    allowed = allowed_numbers(calls)
+    allowed = allowed_numbers(calls, question)
     lines: list[str] = []
     figures: list[str] = []
     rewritten = 0
@@ -983,7 +991,7 @@ def _run_demo(
     if not all(c.ok for c in calls):
         return AskAnswer(screening.redacted, "A tool returned an error, so no answer was written.", "demo",
                          "error", "tool error", calls, context=context)
-    guarded = guard_answer(example.compose(calls, context), calls)
+    guarded = guard_answer(example.compose(calls, context), calls, screening.redacted)
     return AskAnswer(
         question=screening.redacted,
         text=guarded.text,
@@ -1114,7 +1122,7 @@ def _run_live(
             if not reply.text.strip():
                 return AskAnswer(screening.redacted, "The model returned no text.", "live", "error",
                                  "empty answer", calls, api_called=True, model_calls=turn, context=context)
-            guarded = guard_answer(reply.text, calls)
+            guarded = guard_answer(reply.text, calls, screening.redacted)
             return AskAnswer(
                 question=screening.redacted,
                 text=guarded.text,

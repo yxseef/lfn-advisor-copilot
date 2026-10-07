@@ -87,7 +87,7 @@ Two modules can call a language model, the Meeting Brief and Ask the Book. The g
    never the brief, the note or the key.
 6. **Ask the Book only reads.** Its five tools read the Risk Monitor. No tool writes, trades or sends anything, so a
    request to sell or to contact a client is refused with an explanation. The same input filter applies, every answer
-   carries an "AI-generated" banner, and figures that no tool returned are marked "(to verify)".
+   carries an "AI-generated" banner, and figures that neither a tool nor the question gave are marked "(to verify)".
 
 ## How this was built
 
@@ -157,8 +157,9 @@ The model chooses functions; the application runs them. `core/agent.py` handles 
 2. **Call tools.** With a key, the question, the open page and the selected client go to Anthropic with the tool
    list. The model answers with tool calls, the application runs them on the Risk Monitor book and sends the results
    back, at most 6 model calls per question.
-3. **Check the answer.** Every number in the text must appear in a tool's parameters or results, otherwise it is
-   marked "(to verify)". A sentence that reads like a trading instruction is rewritten as a discussion topic.
+3. **Check the answer.** Every number in the text must appear in a tool's parameters or results, or in the question
+   itself, otherwise it is marked "(to verify)". A sentence that reads like a trading instruction is rewritten as a
+   discussion topic.
 4. **Log.** The session journal stores the time, the screened question (ids instead of names, withheld if it held
    personal data), the tools called, the mode (demo or live), the status and the prompt version. Not the answer.
 
