@@ -751,6 +751,7 @@ class AskAnswer:
     advice_rewritten: int = 0
     redactions: int = 0
     api_called: bool = False
+    api_failed: bool = False
     model_calls: int = 0
     created_at: str = field(default_factory=utc_now_str)
     context: AskContext | None = None
@@ -998,6 +999,13 @@ def _run_demo(
 
 
 DEMO_ONLY_TEXT = "Demo mode answers only the example questions below. Pick one:"
+LIVE_UNAVAILABLE_TEXT = (
+    "Sorry, the live assistant is unavailable right now, so the app has switched to demo mode. "
+    "Pick one of the example questions below:"
+)
+LIVE_UNAVAILABLE_REASON = (
+    "The live assistant is unavailable right now, so this is the demo answer. The figures are still today's."
+)
 
 
 # ---------------------------------------------------------------------------
@@ -1193,17 +1201,15 @@ def answer_question(
             return _run_live(model or anthropic_model(api_key or ""), book, screening, context, history), screening
         except Exception as exc:
             logger.warning("Ask the Book model call failed (%s)", type(exc).__name__)
-            reason = "The model call failed, so the demo answer is shown."
             if example is None:
                 return (
-                    AskAnswer(screening.redacted, "The model call failed and this question has no demo answer. "
-                              "Try again or pick an example.", "live", "error",
-                              "The model call failed and no demo answer exists.",
-                              api_called=True, context=context),
+                    AskAnswer(screening.redacted, LIVE_UNAVAILABLE_TEXT, "demo", "demo_only",
+                              "live model unavailable", api_called=True, api_failed=True, context=context),
                     screening,
                 )
-            answer = _run_demo(example, book, screening, context, reason)
+            answer = _run_demo(example, book, screening, context, LIVE_UNAVAILABLE_REASON)
             answer.api_called = True
+            answer.api_failed = True
             return answer, screening
 
     if example is None:

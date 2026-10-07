@@ -15,7 +15,7 @@ Built by Yousif Bag — MSc Finance, HEC Lausanne · [GitHub](https://github.com
 - **Understanding of the LFN business:** the tool is built around the real needs of advisors serving lawyers,
   fiduciaries and notaries: firm accounts, Lombard credit, estates and prospecting.
 - **Portfolio risk management:** historical VaR and Expected Shortfall, risk contributions, profile limits, Lombard
-  lending values and margin-call distance, and configurable stress tests, all computed from real market data.
+  lending values and margin-call distance, and scenario stress tests, all computed from real market data.
 - **Responsible use of AI:** the AI never computes figures or takes actions. It calls read-only tools, every number
   it writes must come from a tool output or is flagged "to verify", inputs are screened for personal data, and an
   advisor must review every draft before export.
@@ -144,7 +144,7 @@ The pages folder is called `app_pages/`, not `pages/`. With a `pages/` folder, S
 
 One Anthropic call (`claude-sonnet-5-5` by default) through `core/llm.py`. The answer must be JSON that matches a
 pydantic schema. Invalid JSON, a schema failure or an API error falls back to the pre-written brief and the page says
-so. Pre-written text lives in `data/demo_briefs.json` and contains no digits, so figures are always today's.
+so. After an API error, the session stays in demo mode. Pre-written text lives in `data/demo_briefs.json` and contains no digits, so figures are always today's.
 
 ### Ask the Book agent
 
@@ -170,11 +170,15 @@ The model chooses functions; the application runs them. `core/agent.py` handles 
 | `run_stress_test` | Any equity, EUR, USD or rate shock (bounded), P&L per client and who would face a margin call |
 | `get_lombard_status` | Loan, lending value, usage, free margin and the uniform fall that would trigger a margin call |
 
-Without a key, five example questions run in demo mode, plus "What is this client's main risk?" when a client is
-selected. They are shown as buttons, open in the Ask window and on the page. The wording is pre-written, but the
-tools are called when the answer is shown, so the figures are today's. Two of the examples are refusals. A free
+Five example questions, plus "What is this client's main risk?" when a client is selected, are shown as buttons in
+the Ask window and on the page, in both modes. Without a key they run in demo mode: the wording is pre-written, but
+the tools are called when the answer is shown, so the figures are today's. Two of the examples are refusals. A free
 question in demo mode gets a one-line reply followed by the example buttons. With a key, live questions are capped
 at 10 per session; past the cap, the demo answer is used when one exists.
+
+If the API fails (no credit left, rate limit, outage), the visitor never sees an error. The answer comes from demo
+mode with a short note, and the rest of the session, Meeting Brief included, stays in demo mode without calling the
+API again.
 
 The Ask button is a Streamlit popover fixed at the bottom right by CSS. It stays open across reruns and fits a
 390-pixel phone screen. The window shows the last answer with its tools collapsed; the full page keeps the

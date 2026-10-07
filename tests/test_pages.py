@@ -138,6 +138,41 @@ def test_demo_examples_are_open_and_follow_a_free_question(monkeypatch: pytest.M
     assert any(e.label.startswith("Tools used (1)") for e in at.expander)
 
 
+def test_api_failure_switches_the_session_to_demo(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls: list[int] = []
+
+    def broken_model(_key: str):
+        def call(*_: object) -> None:
+            calls.append(1)
+            raise RuntimeError("credit balance too low")
+
+        return call
+
+    monkeypatch.setattr("core.llm.resolve_api_key", lambda: "sk-test")
+    monkeypatch.setattr("core.agent.anthropic_model", broken_model)
+    at = AppTest.from_file(str(ROOT / "app_pages" / "4_Ask_the_Book.py"), default_timeout=90).run()
+    assert not at.exception, at.exception
+    assert any(b.key == "page_example_0" for b in at.button)
+    at.chat_input(key="ask_page_input").set_value("Which clients hold Apple?").run()
+    assert not at.exception, at.exception
+    assert not at.error
+    assert any(m.value.startswith("Sorry, the live assistant is unavailable") for m in at.markdown)
+    assert any(b.key == "page_after_0_example_0" for b in at.button)
+    assert any("unavailable right now" in i.value for i in at.info)
+    at.button(key="page_example_0").click().run()
+    assert not at.exception, at.exception
+    assert len(calls) == 1
+    assert any("Demo mode" in m.value for m in at.markdown if "ask-banner" in m.value)
+
+
+def test_live_mode_still_shows_the_examples_in_the_ask_window(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("core.llm.resolve_api_key", lambda: "sk-test")
+    at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=90).run()
+    assert not at.exception, at.exception
+    assert not any(e.label == "Example questions" for e in at.expander)
+    assert any(b.key == "fab_example_0" for b in at.button)
+
+
 def test_ask_the_book_page_runs_every_example(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("core.llm.resolve_api_key", lambda: None)
     at = AppTest.from_file(str(ROOT / "app_pages" / "4_Ask_the_Book.py"), default_timeout=90).run()

@@ -293,6 +293,17 @@ def test_bad_model_output_falls_back_to_demo(book: list[ClientRisk]) -> None:
     assert draft.brief.risk_points == facts["risk_points"]
 
 
+def test_provider_error_falls_back_to_demo_politely(book: list[ClientRisk]) -> None:
+    facts = _facts(book, "C04")
+
+    def complete(_system: str, _user: str) -> str:
+        raise RuntimeError("credit balance too low")
+
+    draft = generate_meeting_brief(facts, api_key="sk-test", complete=complete)
+    assert draft.mode == "demo" and draft.api_called and draft.api_failed
+    assert "unavailable right now" in (draft.fallback_reason or "")
+
+
 def test_session_cap_does_not_call_the_model(book: list[ClientRisk]) -> None:
     facts = _facts(book, "C01")
 

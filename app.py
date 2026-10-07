@@ -31,7 +31,7 @@ WHAT_IT_DEMONSTRATES = """
 - **Understanding of the LFN business:** the tool is built around the real needs of advisors serving lawyers,
   fiduciaries and notaries: firm accounts, Lombard credit, estates and prospecting.
 - **Portfolio risk management:** historical VaR and Expected Shortfall, risk contributions, profile limits, Lombard
-  lending values and margin-call distance, and configurable stress tests, all computed from real market data.
+  lending values and margin-call distance, and scenario stress tests, all computed from real market data.
 - **Responsible use of AI:** the AI never computes figures or takes actions. It calls read-only tools, every number
   it writes must come from a tool output or is flagged "to verify", inputs are screened for personal data, and an
   advisor must review every draft before export.

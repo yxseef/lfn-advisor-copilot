@@ -22,6 +22,7 @@ from core.portfolios import all_tickers, build_clients
 ASK_PAGE = "app_pages/4_Ask_the_Book.py"
 ASK_TITLE = "Ask the Book"
 NO_CLIENT = "No client selected"
+LIVE_UNAVAILABLE_KEY = "live_unavailable"
 # Session key of the client selector on each page, so the assistant knows who "this client" is.
 CLIENT_KEYS: dict[str, str] = {
     "Risk Monitor": "rm_client",
@@ -75,6 +76,21 @@ def init_state() -> None:
     st.session_state.setdefault("ask_live_used", 0)
 
 
+def live_api_key() -> str | None:
+    """The API key, unless a call failed earlier in this session: the session then stays in demo mode."""
+    if st.session_state.get(LIVE_UNAVAILABLE_KEY):
+        return None
+    return llm.resolve_api_key()
+
+
+def live_unavailable() -> bool:
+    return bool(st.session_state.get(LIVE_UNAVAILABLE_KEY))
+
+
+def mark_live_unavailable() -> None:
+    st.session_state[LIVE_UNAVAILABLE_KEY] = True
+
+
 def current_context(page: str) -> AskContext:
     key = CLIENT_KEYS.get(page)
     name = st.session_state.get(key) if key else None
@@ -94,12 +110,14 @@ def ask(question: str, page: str) -> None:
         question,
         load_book(),
         current_context(page),
-        api_key=llm.resolve_api_key(),
+        api_key=live_api_key(),
         history=history,
         live_questions_used=int(st.session_state.ask_live_used),
     )
     if answer.api_called:
         st.session_state.ask_live_used += 1
+    if answer.api_failed:
+        mark_live_unavailable()
     shown = "[withheld: contained personal data]" if screening.personal_data else question.strip()
     st.session_state.ask_history.append({"question": shown, "answer": answer})
     st.session_state.ask_log.append(new_ask_log_entry(answer, screening.personal_data))
@@ -110,9 +128,11 @@ def submit_from_key(key: str, page: str) -> None:
 
 
 def mode_line() -> str:
-    if llm.resolve_api_key():
+    if live_api_key():
         used = int(st.session_state.get("ask_live_used", 0))
         return f"Live mode · {used} of {MAX_LIVE_QUESTIONS_PER_SESSION} questions used this session"
+    if live_unavailable():
+        return "Demo mode · the live assistant is unavailable right now; the example questions still work"
     return "Demo mode · no API key: the example questions are answered with live figures"
 
 
@@ -219,11 +239,8 @@ def render_fab(page: str) -> None:
                     render_turn(last, len(history) - 1, compact=True, expanded=False, page=page, latest=True)
                 if last and last["answer"].status == "demo_only":
                     st.page_link(ASK_PAGE, label="Open full view")
-                elif not llm.resolve_api_key():
+                else:
                     st.markdown("**Example questions**")
                     render_examples(page, context, "fab", stretch=True)
-                else:
-                    with st.expander("Example questions", expanded=not history):
-                        render_examples(page, context, "fab", stretch=True)
                 if not history:
                     st.page_link(ASK_PAGE, label="Open full view")

@@ -5,6 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
+from app_pages.ask_ui import live_api_key, live_unavailable, mark_live_unavailable
 from app_pages.guide import page_intro
 from core import APP_NAME, AUTHOR_CREDIT, DISCLAIMER
 from core.llm import (
@@ -23,7 +24,6 @@ from core.llm import (
     generate_meeting_brief,
     mark_log_reviewed,
     new_log_entry,
-    resolve_api_key,
     screen_advisor_note,
     utc_now_str,
 )
@@ -347,12 +347,17 @@ note = st.text_area(
     help="The client is chosen above. This box is screened before anything is generated.",
 )
 
-api_key = resolve_api_key()
+api_key = live_api_key()
 used = int(st.session_state.live_calls)
 if api_key:
     st.caption(
         f"Live mode available. Generations this session: {used} of {MAX_LIVE_GENERATIONS_PER_SESSION}. "
         "The cap protects the API key."
+    )
+elif live_unavailable():
+    st.caption(
+        "Demo mode: the live AI is unavailable right now, so briefs use the pre-written text. "
+        "Figures and alerts are still computed by the Risk Monitor."
     )
 else:
     st.caption(
@@ -382,6 +387,8 @@ if st.button("Generate brief", type="primary", key="generate_brief"):
             )
         if draft.api_called:
             st.session_state.live_calls += 1
+        if draft.api_failed:
+            mark_live_unavailable()
         st.session_state.current_draft = draft
         st.session_state.brief_log.append(new_log_entry(draft))
 

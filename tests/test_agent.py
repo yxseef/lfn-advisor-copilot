@@ -441,10 +441,11 @@ def test_model_failure_falls_back_to_the_demo_answer(book: list[ClientRisk]) -> 
         raise RuntimeError("provider down")
 
     answer, _ = answer_question(DEMO_QUESTIONS[2], book, NO_CONTEXT, api_key=None, model=broken)
-    assert answer.mode == "demo" and answer.status == "answered" and answer.api_called
-    assert "failed" in (answer.reason or "")
+    assert answer.mode == "demo" and answer.status == "answered" and answer.api_called and answer.api_failed
+    assert "unavailable" in (answer.reason or "")
     free, _ = answer_question("Which clients hold Apple?", book, NO_CONTEXT, api_key=None, model=broken)
-    assert free.status == "error"
+    assert free.mode == "demo" and free.status == "demo_only" and free.api_failed
+    assert free.text.startswith("Sorry, the live assistant is unavailable")
 
 
 def test_tool_loop_is_capped_per_question(book: list[ClientRisk]) -> None:

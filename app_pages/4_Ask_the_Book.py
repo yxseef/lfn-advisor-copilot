@@ -13,13 +13,15 @@ from app_pages.ask_ui import (
     context_line,
     current_context,
     init_state,
+    live_api_key,
+    live_unavailable,
     mode_line,
     render_examples,
     render_turn,
     submit_from_key,
 )
 from app_pages.guide import page_intro
-from core import APP_NAME, AUTHOR_CREDIT, DISCLAIMER, llm
+from core import APP_NAME, AUTHOR_CREDIT, DISCLAIMER
 from core.agent import (
     AGENT_PROMPT_VERSION,
     BANNER,
@@ -44,10 +46,16 @@ page_intro(
     ],
 )
 
-if llm.resolve_api_key():
+if live_api_key():
     st.caption(
         f"Live mode: the model chooses the tools and writes the answer. "
-        f"{int(st.session_state.ask_live_used)} of {MAX_LIVE_QUESTIONS_PER_SESSION} questions used this session."
+        f"{int(st.session_state.ask_live_used)} of {MAX_LIVE_QUESTIONS_PER_SESSION} questions used this session. "
+        "Start with an example question below, or type your own."
+    )
+elif live_unavailable():
+    st.info(
+        "Demo mode — the live assistant is unavailable right now. The example questions below still work, "
+        "and every figure in them is computed now by the same tools a live model would call."
     )
 else:
     st.info(

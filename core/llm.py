@@ -959,6 +959,13 @@ class BriefDraft:
     api_called: bool
     note_accepted: bool
     advisor_note_sent: bool
+    api_failed: bool = False
+
+
+LIVE_UNAVAILABLE_BRIEF = (
+    "The live AI is unavailable right now, so this is the pre-written demo brief. "
+    "The figures and alerts are still today's."
+)
 
 
 def _pack(
@@ -970,6 +977,7 @@ def _pack(
     api_called: bool,
     note_accepted: bool,
     advisor_note_sent: bool,
+    api_failed: bool = False,
 ) -> BriefDraft:
     return BriefDraft(
         generation_id=uuid.uuid4().hex[:12],
@@ -985,6 +993,7 @@ def _pack(
         api_called=api_called,
         note_accepted=note_accepted,
         advisor_note_sent=advisor_note_sent,
+        api_failed=api_failed,
     )
 
 
@@ -1035,7 +1044,7 @@ def generate_meeting_brief(
         raise PersonalDataRejected(findings)
     note_accepted = bool(note)
 
-    def demo(reason: str | None, api_called: bool) -> BriefDraft:
+    def demo(reason: str | None, api_called: bool, api_failed: bool = False) -> BriefDraft:
         return _pack(
             assemble_demo_brief(facts),
             facts,
@@ -1044,6 +1053,7 @@ def generate_meeting_brief(
             api_called=api_called,
             note_accepted=note_accepted,
             advisor_note_sent=False,
+            api_failed=api_failed,
         )
 
     use_live = complete is not None or bool(api_key)
@@ -1063,7 +1073,7 @@ def generate_meeting_brief(
         raw = complete(system, user) if complete is not None else _call_anthropic(api_key or "", system, user)
     except Exception as exc:
         logger.warning("Meeting brief model call failed (%s)", type(exc).__name__)
-        return demo("The model call failed. Showing the pre-generated brief.", True)
+        return demo(LIVE_UNAVAILABLE_BRIEF, True, api_failed=True)
 
     try:
         brief = MeetingBrief.model_validate(parse_model_json(raw))
